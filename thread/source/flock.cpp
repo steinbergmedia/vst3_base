@@ -3,7 +3,7 @@
 // Version     : 1.0
 //
 // Category    : Helpers
-// Filename    : base/source/flock.cpp
+// Filename    : base/thread/source/flock.cpp
 // Created by  : Steinberg, 1995
 // Description : Locks
 //
@@ -37,7 +37,7 @@
 
 #define DEBUG_LOCK 0
 
-#include "base/source/flock.h"
+#include "base/thread/include/flock.h"
 #include "base/source/fdebug.h"
 
 //------------------------------------------------------------------------
@@ -57,8 +57,10 @@
 
 #endif
 
-//------------------------------------------------------------------------
 namespace Steinberg {
+namespace Base {
+namespace Thread {
+
 
 //------------------------------------------------------------------------
 //	FLock implementation
@@ -70,7 +72,7 @@ FLock::FLock (const char8* name)
 	pthread_mutexattr_init (&mutexAttr);
 	pthread_mutexattr_settype (&mutexAttr, PTHREAD_MUTEX_RECURSIVE);
 	if (pthread_mutex_init (&mutex, &mutexAttr) != 0)
-		{WARNING("mutex_init failed")}
+		{SMTG_WARNING("mutex_init failed")}
 	pthread_mutexattr_destroy (&mutexAttr);
 
 #elif WINDOWS
@@ -138,5 +140,7 @@ bool FLock::trylock ()
 #endif 
 }
 
-//------------------------------------------------------------------------
-} // namespace Steinberg
+} // Thread
+} // Base
+} // Steinberg
+

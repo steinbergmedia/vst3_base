@@ -307,6 +307,7 @@ void CALLBACK WinPlatformTimer::TimerProc (HWND hwnd, UINT uMsg, UINT_PTR idEven
 					timer->callback->onTimer (timer);
 				return;
 			}
+			++it;
 		}
 	}
 }

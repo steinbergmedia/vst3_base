@@ -3,9 +3,9 @@
 // Version     : 1.0
 //
 // Category    : Helpers
-// Filename    : base/source/baseidds.cpp
-// Created by  : Steinberg, 01/2008
-// Description : Basic Interface
+// Filename    : base/thread/include/fcondition.h
+// Created by  : Steinberg, 1995
+// Description : the threads and locks and signals...
 //
 //-----------------------------------------------------------------------------
 // LICENSE
@@ -35,18 +35,89 @@
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 
-#include "pluginterfaces/base/funknown.h"
-#include "pluginterfaces/base/istringresult.h"
-#include "pluginterfaces/base/ipersistent.h"
+//----------------------------------------------------------------------------------
+/** @file base/thread/include/fcondition.h
+	signal. */
+/** @defgroup baseThread Thread Handling */
+//----------------------------------------------------------------------------------
+#pragma once
 
+#include "pluginterfaces/base/ftypes.h"
 
-namespace Steinberg {
+#if PTHREADS 
+#include <pthread.h>
+#endif
 
-DEF_CLASS_IID (IString)
-DEF_CLASS_IID (IStringResult)
-
-DEF_CLASS_IID (IPersistent)
-DEF_CLASS_IID (IAttributes)
-DEF_CLASS_IID (IAttributes2)
 //------------------------------------------------------------------------
-} // namespace Steinberg
+namespace Steinberg {
+namespace Base {
+namespace Thread {
+
+//------------------------------------------------------------------------
+/**	FCondition - wraps the signal and wait calls in win32
+@ingroup baseThread	*/
+//------------------------------------------------------------------------
+class FCondition
+{
+public:
+//------------------------------------------------------------------------
+
+	/** Condition constructor.
+	 *  @param name name of condition
+	 */
+	FCondition (const char8* name = 0 /* "FCondition" */ );
+
+	/** Condition destructor.
+	 */
+	~FCondition ();
+	
+	/** Signals one thread.
+	 */
+	void signal ();
+
+	/** Signals all threads.
+	 */
+	void signalAll ();
+
+	/** Waits for condition.
+	 */
+	void wait ();
+
+	/** Waits for condition with timeout
+	 *  @param timeout time out in milliseconds
+	 *  @return false if timed out
+	 */
+	bool waitTimeout (int32 timeout = -1);
+
+	/** Resets condition.
+	 */
+	void reset ();
+
+#if WINDOWS
+	/** Gets condition handle.
+	 *  @return handle
+	 */
+	void* getHandle () { return event; }
+#endif
+
+//------------------------------------------------------------------------
+private:
+#if PTHREADS
+	pthread_mutex_t mutex;		///< Mutex object
+	pthread_cond_t cond;		///< Condition object
+	int32 state;				///< Use to hold the state of the signal
+	int32 waiters;				///< Number of waiters
+
+	#if DEVELOPMENT
+	int32     waits;			///< Waits count
+	int32     signalCount;		///< Signals count
+	#endif
+#elif WINDOWS
+	void* event;				///< Event handle
+#endif
+};
+
+} // Thread
+} // Base
+} // Steinberg
+

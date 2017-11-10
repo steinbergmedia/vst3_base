@@ -38,7 +38,7 @@
 #pragma once
 
 #include "base/source/fobject.h"
-#include "base/source/flock.h"
+#include "base/thread/include/flock.h"
 #include "pluginterfaces/base/iupdatehandler.h"
 
 namespace Steinberg {
@@ -115,7 +115,8 @@ public:
 	void printForObject (FObject* object) const;
 #endif
 	/// @endcond
-
+	size_t countDependencies (FUnknown* object = 0);
+	
 	OBJ_METHODS (UpdateHandler, FObject)
 	FUNKNOWN_METHODS2 (IUpdateHandler, IUpdateManager, FObject)
 	SINGLETON (UpdateHandler)
@@ -123,9 +124,12 @@ public:
 private:
 	tresult doTriggerUpdates (FUnknown* object, int32 message, bool suppressUpdateDone);
 
-	FLock lock;
+	Steinberg::Base::Thread::FLock lock;
 	Update::Table* table;
+	friend struct LockUpdateDependencies;
+	static bool lockUpdates;
 };
+
 
 //------------------------------------------------------------------------
 } // namespace Steinberg

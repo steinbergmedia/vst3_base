@@ -12,8 +12,6 @@ set(base_sources
 	source/fdynlib.h
 	source/fobject.cpp
 	source/fobject.h
-	source/flock.cpp
-	source/flock.h
 	source/fstreamer.cpp
 	source/fstreamer.h
 	source/fstring.cpp
@@ -22,14 +20,16 @@ set(base_sources
 	source/timer.h
 	source/updatehandler.cpp
 	source/updatehandler.h
+	thread/include/fcondition.h
+	thread/include/flock.h
+	thread/source/fcondition.cpp
+	thread/source/flock.cpp
 )
 
 set(base_sources_ext
 	source/basefwd.h
 	source/classfactory.cpp
 	source/classfactory.h
-	source/fatomic.cpp
-	source/fatomic.h
 	source/fbitset.cpp
 	source/fbitset.h
 	source/fcontainer.h
@@ -47,19 +47,22 @@ set(base_sources_ext
 	source/frect.h
 	source/fregion.cpp
 	source/fregion.h
-	source/frwlock_generic.h
-	source/frwlock_macosx.h
-	source/frwlock_windows.h
 	source/fstdmethods.h
 	source/fstringmethods.h
 	source/fstringstream.h
-	source/fthread.cpp
-	source/fthread.h
 	source/funknownfactory.h
 	source/hexbinary.h
 	source/istreamwrapper.cpp
 	source/istreamwrapper.h
 	source/tringbuffer.h	
+	thread/include/fatomic.h
+	thread/include/forwarddeclarations.h
+	thread/include/frwlock_generic.h
+	thread/include/frwlock_macosx.h
+	thread/include/frwlock_windows.h
+	thread/include/fthread.h
+	thread/source/fatomic.cpp
+	thread/source/fthread.cpp
 )
 if (VST_SDK)
 	add_library(base STATIC ${base_sources})

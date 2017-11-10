@@ -884,7 +884,7 @@ bool ConstString::startsWith (const ConstString& str, CompareMode mode /*= kCase
 			return strncmp16 (tmp.buffer16, str.buffer16, str.length ()) == 0;
 		return strnicmp16 (tmp.buffer16, str.buffer16, str.length ()) == 0;
 	}
-	ASSERT(false)
+	SMTG_ASSERT(false)
 	return false; // should never be reached
 }
 
@@ -935,7 +935,7 @@ bool ConstString::endsWith (const ConstString& str, CompareMode mode /*= kCaseSe
 			return strncmp16 (tmp.buffer16 + (tmp.length () - str.length ()), str.buffer16, str.length ()) == 0;
 		return strnicmp16 (tmp.buffer16 + (tmp.length () - str.length ()), str.buffer16, str.length ()) == 0;
 	}
-	ASSERT(false)
+	SMTG_ASSERT(false)
 	return false; // should never be reached
 }
 
@@ -1713,7 +1713,7 @@ bool ConstString::isCharAlphaNum (const char8 character)
 //-----------------------------------------------------------------------------
 bool ConstString::isCharAlphaNum (const char16 character)
 {
-	return iswalnum (character) != 0; // this may not work on MacOSX when another locale is set inside the c-lib
+	return iswalnum (character) != 0; // this may not work on macOSX when another locale is set inside the c-lib
 }
 
 //-----------------------------------------------------------------------------
@@ -1725,7 +1725,7 @@ bool ConstString::isCharDigit (const char8 character)
 //-----------------------------------------------------------------------------
 bool ConstString::isCharDigit (const char16 character)
 {
-	return iswdigit (character) != 0;	// this may not work on MacOSX when another locale is set inside the c-lib
+	return iswdigit (character) != 0;	// this may not work on macOSX when another locale is set inside the c-lib
 }
 
 //-----------------------------------------------------------------------------
@@ -1928,7 +1928,7 @@ int32 ConstString::multiByteToWideString (char16* dest, const char8* source, int
 
 #endif
 
-	ASSERT (result > 0)
+	SMTG_ASSERT (result > 0)
 	return result;
 }
 
@@ -2128,7 +2128,7 @@ String::String (String&& str)
 //-----------------------------------------------------------------------------
 String& String::operator= (String&& str)
 {
-	ASSERT (buffer == 0 || buffer != str.buffer); 
+	SMTG_ASSERT (buffer == 0 || buffer != str.buffer);
 	tryFreeBuffer ();
 	
 	isWide = str.isWide;
@@ -2182,7 +2182,7 @@ bool String::toWideString (uint32 sourceCodePage)
 }
 
 #define SMTG_STRING_CHECK_CONVERSION 1
-#define SMTG_STRING_CHECK_CONVERSION_NO_BREAK 0
+#define SMTG_STRING_CHECK_CONVERSION_NO_BREAK 1
 
 #if SMTG_STRING_CHECK_CONVERSION_NO_BREAK
 	#define SMTG_STRING_CHECK_MSG FDebugPrint
@@ -2441,12 +2441,12 @@ bool String::setChar8 (uint32 index, char8 c)
 				if (multiByteToWideString (dest, src, 2) > 0)
 					buffer16[index] = dest[0];
 			}
-			ASSERT (buffer16[len] == 0)
+			SMTG_ASSERT (buffer16[len] == 0)
 		}
 		else
 		{
 			buffer8[index] = c;
-			ASSERT (buffer8[len] == 0)
+			SMTG_ASSERT (buffer8[len] == 0)
 		}
 
 		if (c == 0)
@@ -2485,11 +2485,11 @@ bool String::setChar16 (uint32 index, char16 c)
 		if (isWide)
 		{
 			buffer16[index] = c;
-			ASSERT (buffer16[len] == 0)
+			SMTG_ASSERT (buffer16[len] == 0)
 		}
 		else
 		{
-			ASSERT (buffer8[len] == 0)
+			SMTG_ASSERT (buffer8[len] == 0)
 			char16 src[] = {c, 0};
 			char8 dest[8] = {0};
 			if (wideStringToMultiByte (dest, src, 2) > 0 && dest[1] == 0)
@@ -2534,7 +2534,7 @@ String& String::assign (const char8* str, int32 n, bool isTerminated)
 		if (buffer8 && n > 0)
 		{
 			memcpy (buffer8, str, n * sizeof (char8));
-			ASSERT (buffer8[n] == 0)
+			SMTG_ASSERT (buffer8[n] == 0)
 		}
 		isWide = 0;
 		len = n;
@@ -2561,7 +2561,7 @@ String& String::assign (const char16* str, int32 n, bool isTerminated)
 		if (buffer16 && n > 0)
 		{
 			memcpy (buffer16, str, n * sizeof (char16));
-			ASSERT (buffer16[n] == 0)
+			SMTG_ASSERT (buffer16[n] == 0)
 		}
 		isWide = 1;
 		len = n;
@@ -2577,7 +2577,7 @@ String& String::assign (char8 c, int32 n)
 		if (buffer8 && n > 0)
 		{
 			memset (buffer8, c, n * sizeof (char8));
-			ASSERT (buffer8[n] == 0)
+			SMTG_ASSERT (buffer8[n] == 0)
 		}
 		isWide = 0;
 		len = n;
@@ -2595,7 +2595,7 @@ String& String::assign (char16 c, int32 n)
 		{
 			for (int32 i = 0; i < n; i++)
 				buffer16[i] = c;
-			ASSERT (buffer16[n] == 0)
+			SMTG_ASSERT (buffer16[n] == 0)
 		}
 		isWide = 1;
 		len = n;
@@ -2642,7 +2642,7 @@ String& String::append (const char8* str, int32 n)
 		if (buffer)
 		{
 			memcpy (buffer8 + len, str, n * sizeof (char8));
-			ASSERT (buffer8[newlen] == 0)
+			SMTG_ASSERT (buffer8[newlen] == 0)
 		}
 
 		len += n;
@@ -2677,7 +2677,7 @@ String& String::append (const char16* str, int32 n)
 		if (buffer16)
 		{
 			memcpy (buffer16 + len, str, n * sizeof (char16));
-			ASSERT (buffer16[newlen] == 0)
+			SMTG_ASSERT (buffer16[newlen] == 0)
 		}
 
 		len += n;
@@ -2711,7 +2711,7 @@ String& String::append (const char8 c, int32 n)
 		if (buffer)
 		{
 			memset (buffer8 + len, c, n * sizeof (char8));
-			ASSERT (buffer8[newlen] == 0)
+			SMTG_ASSERT (buffer8[newlen] == 0)
 		}
 
 		len += n;
@@ -2743,7 +2743,7 @@ String& String::append (const char16 c, int32 n)
 		{
 			for (int32 i = len; i < newlen; i++)
 				buffer16[i] = c;
-			ASSERT (buffer16[newlen] == 0)
+			SMTG_ASSERT (buffer16[newlen] == 0)
 		}
 
 		len += n;
@@ -2788,7 +2788,7 @@ String& String::insertAt (uint32 idx, const char8* str, int32 n)
 			if (idx < len)
 				memmove (buffer8 + idx + n, buffer8 + idx, (len - idx) * sizeof (char8));
 			memcpy (buffer8 + idx, str, n * sizeof (char8));
-			ASSERT (buffer8[newlen] == 0)
+			SMTG_ASSERT (buffer8[newlen] == 0)
 		}
 
 		len += n;
@@ -2822,7 +2822,7 @@ String& String::insertAt (uint32 idx, const char16* str, int32 n)
 			if (idx < len)
 				memmove (buffer16 + idx + n, buffer16 + idx, (len - idx) * sizeof (char16));
 			memcpy (buffer16 + idx, str, n * sizeof (char16));
-			ASSERT (buffer16[newlen] == 0)
+			SMTG_ASSERT (buffer16[newlen] == 0)
 		}
 
 		len += n;
@@ -3039,7 +3039,7 @@ bool String::replaceChars16 (const char16* toReplace, char16 toReplaceBy)
 
 		if (toReplaceA.length () > 1)
 		{
-			WARNING("cannot replace non ASCII chars on non Wide String")
+			SMTG_WARNING("cannot replace non ASCII chars on non Wide String")
 			return false;
 		}
 
@@ -3328,7 +3328,7 @@ String& String::printf (const char8* format, ...)
 	va_list marker;
 	va_start (marker, format);
 	
-	vsnprintf (string, kPrintfBufferSize, format, marker);
+	vsnprintf (string, kPrintfBufferSize-1, format, marker);
 	return assign (string);
 }
 
@@ -3341,7 +3341,7 @@ String& String::printf (const char16* format, ...)
 	va_list marker;
 	va_start (marker, format);
 	
-	vsnwprintf (string, kPrintfBufferSize, format, marker);
+	vsnwprintf (string, kPrintfBufferSize-1, format, marker);
 	return assign (string);
 }
 
@@ -3350,7 +3350,7 @@ String& String::vprintf (const char8* format, va_list args)
 {
 	char8 string[kPrintfBufferSize];
 
-	vsnprintf (string, kPrintfBufferSize, format, args);
+	vsnprintf (string, kPrintfBufferSize-1, format, args);
 	return assign (string);
 }
 
@@ -3359,7 +3359,7 @@ String& String::vprintf (const char16* format, va_list args)
 {
 	char16 string[kPrintfBufferSize];
 
-	vsnwprintf (string, kPrintfBufferSize, format, args);
+	vsnwprintf (string, kPrintfBufferSize-1, format, args);
 	return assign (string);
 }
 

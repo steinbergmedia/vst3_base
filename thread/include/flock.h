@@ -3,7 +3,7 @@
 // Version     : 1.0
 //
 // Category    : Helpers
-// Filename    : base/source/flock.h
+// Filename    : base/thread/include/flock.h
 // Created by  : Steinberg, 1995
 // Description : locks
 //
@@ -36,16 +36,16 @@
 //-----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------
-/** @file base/source/flock.h
-	Locks. */
+/** @file base/thread/include/flock.h
+    Locks. */
 /** @defgroup baseLocks Locks */
 //----------------------------------------------------------------------------------
 #pragma once
 
-#include "fobject.h"
+#include "base/source/fobject.h"
 #include "pluginterfaces/base/ftypes.h"
 
-#if PTHREADS 
+#if PTHREADS
 #include <pthread.h>
 
 #elif WINDOWS
@@ -60,8 +60,9 @@ struct CRITSECT							// CRITICAL_SECTION
 };
 #endif
 
-//------------------------------------------------------------------------
 namespace Steinberg {
+namespace Base {
+namespace Thread {
 
 //------------------------------------------------------------------------
 /** Lock interface declaration.
@@ -72,18 +73,14 @@ struct ILock
 //------------------------------------------------------------------------
 	virtual ~ILock () {}
 
-	/** Enables lock.
-	 */
+	/** Enables lock. */
 	virtual void lock () = 0;
 
-	/** Disables lock.
-	 */
+	/** Disables lock. */
 	virtual void unlock () = 0;
 
-	/** Tries to disable lock.
-	 */
+	/** Tries to disable lock. */
 	virtual bool trylock () = 0;
-
 //------------------------------------------------------------------------
 };
 
@@ -101,24 +98,21 @@ public:
 	 */
 	FLock (const char8* name = "FLock");
 
-	/** Lock destructor.
-	 */
+	/** Lock destructor. */
 	~FLock ();
 
 	//-- ILock -----------------------------------------------------------
 	virtual void lock () SMTG_OVERRIDE;
 	virtual void unlock () SMTG_OVERRIDE;
 	virtual bool trylock () SMTG_OVERRIDE;
-	//--------------------------------------------------------------------
 
 //------------------------------------------------------------------------
 protected:
 #if PTHREADS
-	pthread_mutex_t mutex;			///< Mutex object
-	
+	pthread_mutex_t mutex; ///< Mutex object
+
 #elif WINDOWS
-	CRITSECT section;				///< Critical section object
-		
+	CRITSECT section; ///< Critical section object
 #endif
 };
 
@@ -144,20 +138,18 @@ public:
 	/** FGuard constructor.
 	 *  @param _lock guard this lock
 	 */
-	FGuard (ILock& _lock) : lock (_lock) {lock.lock ();}
+	FGuard (ILock& _lock) : lock (_lock) { lock.lock (); }
 
-	/** FGuard destructor.
-	 */
-	~FGuard () {lock.unlock ();}
+	/** FGuard destructor. */
+	~FGuard () { lock.unlock (); }
 
 //------------------------------------------------------------------------
 private:
-	ILock& lock;			///< guarded lock
+	ILock& lock; ///< guarded lock
 };
 
-
 //------------------------------------------------------------------------
-/**	Conditional Guard - Locks only if valid lock is passed.								
+/**	Conditional Guard - Locks only if valid lock is passed.
 @ingroup baseLocks	*/
 //------------------------------------------------------------------------
 class FConditionalGuard
@@ -168,16 +160,24 @@ public:
 	/** FConditionGuard constructor.
 	 *  @param _lock guard this lock
 	 */
-	FConditionalGuard (FLock* _lock) : lock (_lock) { if (lock) lock->lock (); }
+	FConditionalGuard (FLock* _lock) : lock (_lock)
+	{
+		if (lock)
+			lock->lock ();
+	}
 
-	/** FConditionGuard destructor.
-	 */
-	~FConditionalGuard () { if (lock) lock->unlock (); }
+	/** FConditionGuard destructor. */
+	~FConditionalGuard ()
+	{
+		if (lock)
+			lock->unlock ();
+	}
 
 //------------------------------------------------------------------------
 private:
-	FLock* lock;			///< guarded lock
+	FLock* lock; ///< guarded lock
 };
 
-//------------------------------------------------------------------------
-} // namespace Steinberg
+} // Thread
+} // Base
+} // Steinberg
