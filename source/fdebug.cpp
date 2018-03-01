@@ -11,7 +11,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -45,7 +45,7 @@
 #include <cstdarg>
 #include <cstdio>
 
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
 #endif
@@ -54,7 +54,7 @@
 #define vsnprintf _vsnprintf
 #define snprintf _snprintf
 
-#elif MAC
+#elif SMTG_OS_MACOS
 #include <errno.h>
 #include <mach/mach_init.h>
 #include <mach/mach_time.h>
@@ -94,7 +94,7 @@ void assertion_failed (char const* expr, char const* function, char const* file,
 	}
 	else
 	{
-		assert (!message);
+		assert (!(const char *)message);
 	}
 #endif
 }
@@ -116,9 +116,9 @@ static void printDebugString (const char* string)
 	}
 	else
 	{
-#if MAC
+#if SMTG_OS_MACOS
 		fprintf (stderr, "%s", string);
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 		OutputDebugStringA (string);
 #endif
 	}
@@ -137,11 +137,11 @@ void FDebugPrint (const char* format, ...)
 	printDebugString (string);
 }
 
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 #define AmIBeingDebugged IsDebuggerPresent
 #endif
 
-#if LINUX
+#if SMTG_OS_LINUX
 #include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -187,7 +187,7 @@ void FDebugBreak (const char* format, ...)
 
 		if (breakIntoDebugger)
 		{
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 			__debugbreak (); // intrinsic version of DebugBreak()
 #elif __ppc64__ || __ppc__ || __arm__
 			kill (getpid (), SIGINT);
@@ -203,7 +203,7 @@ void FDebugBreak (const char* format, ...)
 //--------------------------------------------------------------------------
 void FPrintLastError (const char* file, int line)
 {
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 	LPVOID lpMessageBuffer;
 	FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
 	                GetLastError (), MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -212,7 +212,7 @@ void FPrintLastError (const char* file, int line)
 	LocalFree (lpMessageBuffer);
 #endif
 
-#if MAC
+#if SMTG_OS_MACOS
 #if !__MACH__
 	extern int errno;
 #endif
@@ -220,7 +220,7 @@ void FPrintLastError (const char* file, int line)
 #endif
 }
 
-#if MAC
+#if SMTG_OS_MACOS
 
 //------------------------------------------------------------------------
 void* operator new (size_t size, int, const char* file, int line)
@@ -309,6 +309,6 @@ bool AmIBeingDebugged (void)
 	return ((info.kp_proc.p_flag & P_TRACED) != 0);
 }
 
-#endif // MAC
+#endif // SMTG_OS_MACOS
 
 #endif // DEVELOPMENT

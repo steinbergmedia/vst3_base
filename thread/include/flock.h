@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -45,10 +45,10 @@
 #include "base/source/fobject.h"
 #include "pluginterfaces/base/ftypes.h"
 
-#if PTHREADS
+#if SMTG_PTHREADS
 #include <pthread.h>
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 struct CRITSECT							// CRITICAL_SECTION
 {
 	void* DebugInfo;					// PRTL_CRITICAL_SECTION_DEBUG DebugInfo;
@@ -108,10 +108,10 @@ public:
 
 //------------------------------------------------------------------------
 protected:
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_t mutex; ///< Mutex object
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	CRITSECT section; ///< Critical section object
 #endif
 };

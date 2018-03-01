@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -41,7 +41,7 @@
 #include "base/source/fdebug.h"
 
 //------------------------------------------------------------------------
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 //------------------------------------------------------------------------
 #ifndef WINVER
 #define WINVER 0x0500
@@ -65,9 +65,9 @@ namespace Thread {
 //------------------------------------------------------------------------
 //	FLock implementation
 //------------------------------------------------------------------------
-FLock::FLock (const char8* name)
+FLock::FLock (const char8* /*name*/)
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutexattr_t mutexAttr;
 	pthread_mutexattr_init (&mutexAttr);
 	pthread_mutexattr_settype (&mutexAttr, PTHREAD_MUTEX_RECURSIVE);
@@ -75,7 +75,7 @@ FLock::FLock (const char8* name)
 		{SMTG_WARNING("mutex_init failed")}
 	pthread_mutexattr_destroy (&mutexAttr);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	INIT_CS (section)
 #else
 #warning implement FLock!
@@ -85,10 +85,10 @@ FLock::FLock (const char8* name)
 //------------------------------------------------------------------------
 FLock::~FLock ()
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_destroy (&mutex);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	DeleteCriticalSection ((LPCRITICAL_SECTION)&section);
 		
 #endif
@@ -101,10 +101,10 @@ void FLock::lock ()
 	FDebugPrint ("FLock::lock () %x\n", this);
 #endif
 
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_lock (&mutex);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	EnterCriticalSection ((LPCRITICAL_SECTION)&section);
 
 #endif
@@ -117,10 +117,10 @@ void FLock::unlock ()
 	FDebugPrint ("FLock::unlock () %x\n", this);
 #endif
 	
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_unlock (&mutex);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	LeaveCriticalSection ((LPCRITICAL_SECTION)&section);
 
 #endif 
@@ -129,10 +129,10 @@ void FLock::unlock ()
 //------------------------------------------------------------------------
 bool FLock::trylock ()
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	return pthread_mutex_trylock (&mutex) == 0;
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	return TryEnterCriticalSection ((LPCRITICAL_SECTION)&section) != 0 ? true : false;
 
 #else

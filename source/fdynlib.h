@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -90,7 +90,7 @@ public:
 	/** Returns the platform dependent representation of the library instance. */
 	void* getPlatformInstance () const { return instance; } 
 
-#if MAC
+#if SMTG_OS_MACOS
 	/** Returns @c true if the library is a bundle (Mac only). */
 	bool isBundleLib () const {return isBundle;}
 #endif
@@ -102,7 +102,7 @@ protected:
 
 	void* instance;
 
-#if MAC
+#if SMTG_OS_MACOS
 	void* firstSymbol;
 	bool isBundle;
 #endif

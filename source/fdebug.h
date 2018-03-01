@@ -11,7 +11,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -53,7 +53,7 @@
 #include "pluginterfaces/base/ftypes.h"
 #include <string.h>
 
-#if MAC
+#if SMTG_OS_MACOS
 #include <new>
 #endif
 
@@ -71,7 +71,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 
 /** Disable compiler warning:
  * C4291: "No matching operator delete found; memory will not be freed if initialization throws an
@@ -81,7 +81,7 @@
 #pragma warning(disable : 4985)
 #endif
 
-#endif // WINDOWS
+#endif // SMTG_OS_WINDOWS
 
 #if DEVELOPMENT
 //-----------------------------------------------------------------------------
@@ -162,12 +162,11 @@ extern DebugPrintLogger gDebugPrintLogger;
 /** Definition of memory allocation macros:
     Use "NEW" to allocate storage for individual objects.
     Use "NEWVEC" to allocate storage for an array of objects. */
-#if MAC
+#if SMTG_OS_MACOS
 void* operator new (size_t, int, const char*, int);
 void* operator new[] (size_t, int, const char*, int);
 void operator delete (void* p, int, const char* file, int line);
 void operator delete[] (void* p, int, const char* file, int line);
-
 #ifndef NEW
 #define NEW new (1, __FILE__, __LINE__)
 #define NEWVEC new (1, __FILE__, __LINE__)
@@ -175,7 +174,7 @@ void operator delete[] (void* p, int, const char* file, int line);
 
 #define DEBUG_NEW DEBUG_NEW_LEAKS
 
-#elif WINDOWS && defined(_MSC_VER)
+#elif SMTG_OS_WINDOWS && defined(_MSC_VER)
 #ifndef NEW
 void* operator new (size_t, int, const char*, int);
 #define NEW new (1, __FILE__, __LINE__)
@@ -209,6 +208,7 @@ void* operator new (size_t, int, const char*, int);
 #ifndef NEW
 #define NEW new
 #define NEWVEC new
+	
 #endif
 #endif
 
@@ -219,7 +219,7 @@ void* operator new (size_t, int, const char*, int);
 #endif
 
 #if !SMTG_RENAME_ASSERT
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 #undef ASSERT
 #endif
 

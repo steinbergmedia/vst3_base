@@ -9,7 +9,7 @@
 // 
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -79,7 +79,7 @@ int32 getTicks ()
 } // namespace Steinberg
 
 
-#if MAC
+#if SMTG_OS_MACOS
 #include <CoreFoundation/CoreFoundation.h>
 #include <mach/mach_time.h>
 
@@ -194,7 +194,7 @@ Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 
 }
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 
 #include <windows.h>
 #include <list>
@@ -293,7 +293,7 @@ void WinPlatformTimer::stop ()
 }
 
 //------------------------------------------------------------------------
-void CALLBACK WinPlatformTimer::TimerProc (HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+void CALLBACK WinPlatformTimer::TimerProc (HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR idEvent, DWORD /*dwTime*/)
 {
 	if (timersEnabled && timers)
 	{
@@ -325,6 +325,6 @@ Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 //------------------------------------------------------------------------
 } // namespace Steinberg
 
-#elif LINUX
+#elif SMTG_OS_LINUX
 #warning DEPRECATED No Linux implementation
 #endif

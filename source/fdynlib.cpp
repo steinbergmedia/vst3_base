@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -39,10 +39,10 @@
 #include "pluginterfaces/base/fstrdefs.h"
 #include "base/source/fstring.h"
 
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 #include <windows.h>
 
-#elif MAC
+#elif SMTG_OS_MACOS
 #include <mach-o/dyld.h>
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -53,7 +53,7 @@ static const Steinberg::tchar kUnixDelimiter = STR ('/');
 
 namespace Steinberg {
 
-#if MAC
+#if SMTG_OS_MACOS
 #include <dlfcn.h>
 
 // we ignore for the moment that the NSAddImage functions are deprecated
@@ -103,7 +103,7 @@ bool FDynLibrary::init (const tchar* n, bool addExtension)
 
 	Steinberg::String name (n);
 		
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 	if (addExtension)
 		name.append (STR (".dll"));
 
@@ -111,7 +111,7 @@ bool FDynLibrary::init (const tchar* n, bool addExtension)
 	if (instance)
 		isloaded = true;
 		
-#elif MAC
+#elif SMTG_OS_MACOS
 	isBundle = false;
 	// first check if it is a bundle
 	if (addExtension)
@@ -147,7 +147,7 @@ bool FDynLibrary::init (const tchar* n, bool addExtension)
 
 	name.assign (n);
 
-#if !TARGET_OS_IPHONE
+#if !SMTG_OS_IOS
 	if (!isBundle)
 	{
 		// now we check for a dynamic library
@@ -193,10 +193,10 @@ bool FDynLibrary::unload ()
 	if (!isLoaded ())
 		return false;
 
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 	FreeLibrary ((HINSTANCE)instance);
 	
-#elif MAC
+#elif SMTG_OS_MACOS
 	if (isBundle)
 	{
 		if (CFGetRetainCount ((CFTypeRef)instance) == 1)
@@ -224,12 +224,12 @@ bool FDynLibrary::unload ()
 void* FDynLibrary::getProcAddress (const char* name)
 {
 	if (!isloaded)
-		return 0;
+		return nullptr;
 	
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 	return (void*)GetProcAddress ((HINSTANCE)instance, name);
 	
-#elif MAC
+#elif SMTG_OS_MACOS
 	if (isBundle)
 	{
 		CFStringRef functionName = CFStringCreateWithCString (NULL, name, kCFStringEncodingASCII);
@@ -237,7 +237,7 @@ void* FDynLibrary::getProcAddress (const char* name)
 		CFRelease (functionName);
 		return result;
 	}
-#if !TARGET_OS_IPHONE
+#if !SMTG_OS_IOS
 	else
 	{
 		char* symbolName = (char*) malloc (strlen (name) + 2);
@@ -255,9 +255,10 @@ void* FDynLibrary::getProcAddress (const char* name)
 	}
 #endif // !TARGET_OS_IPHONE
 
+	return nullptr;
+#else
+	return nullptr;
 #endif
-
-	return 0;
 }
 
 //------------------------------------------------------------------------

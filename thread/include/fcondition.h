@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@
 
 #include "pluginterfaces/base/ftypes.h"
 
-#if PTHREADS 
+#if SMTG_PTHREADS 
 #include <pthread.h>
 #endif
 
@@ -93,7 +93,7 @@ public:
 	 */
 	void reset ();
 
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 	/** Gets condition handle.
 	 *  @return handle
 	 */
@@ -102,7 +102,7 @@ public:
 
 //------------------------------------------------------------------------
 private:
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_t mutex;		///< Mutex object
 	pthread_cond_t cond;		///< Condition object
 	int32 state;				///< Use to hold the state of the signal
@@ -112,7 +112,7 @@ private:
 	int32     waits;			///< Waits count
 	int32     signalCount;		///< Signals count
 	#endif
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	void* event;				///< Event handle
 #endif
 };

@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@
 #include <stdlib.h>
 
 //------------------------------------------------------------------------
-#if PTHREADS
+#if SMTG_PTHREADS
 //------------------------------------------------------------------------
 #if __MACH__
 extern "C" {
@@ -68,7 +68,7 @@ extern "C" {
 
 #include <errno.h>
 
-#if MAC
+#if SMTG_OS_MACOS
 #include <TargetConditionals.h>
 #if !TARGET_OS_IPHONE
 #include <CoreServices/CoreServices.h>
@@ -77,7 +77,7 @@ extern "C" {
 
 #include <sys/time.h>
 //------------------------------------------------------------------------
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 #include <windows.h>
 #endif
 
@@ -91,7 +91,7 @@ namespace Thread {
  */
 FCondition::FCondition (const char8* name)
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_init (&mutex, 0);
 	pthread_cond_init (&cond, 0);
 	state = 0;
@@ -101,7 +101,7 @@ FCondition::FCondition (const char8* name)
 	signalCount = 0;
 #endif
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	// use name if existing
 	event = CreateEventA (0, FALSE, FALSE, name);
 
@@ -111,11 +111,11 @@ FCondition::FCondition (const char8* name)
 //------------------------------------------------------------------------
 FCondition::~FCondition ()
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_destroy (&mutex);
 	pthread_cond_destroy (&cond);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	CloseHandle (event);
 
 #endif
@@ -124,7 +124,7 @@ FCondition::~FCondition ()
 //------------------------------------------------------------------------
 void FCondition::signal ()
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_lock (&mutex);
 	state = 1;
 #if DEVELOPMENT
@@ -133,7 +133,7 @@ void FCondition::signal ()
 	pthread_cond_signal (&cond);
 	pthread_mutex_unlock (&mutex);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	BOOL result = PulseEvent (event);
 	if (!result)
 	{
@@ -146,7 +146,7 @@ void FCondition::signal ()
 //------------------------------------------------------------------------
 void FCondition::signalAll ()
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_lock (&mutex);
 	state = waiters + 1;
 
@@ -156,7 +156,7 @@ void FCondition::signalAll ()
 	pthread_cond_broadcast (&cond);
 	pthread_mutex_unlock (&mutex);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	BOOL result = SetEvent (event);
 	if (!result)
 	{
@@ -169,7 +169,7 @@ void FCondition::signalAll ()
 //------------------------------------------------------------------------
 void FCondition::wait ()
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	pthread_mutex_lock (&mutex);
 #if DEVELOPMENT
 	waits++;
@@ -183,7 +183,7 @@ void FCondition::wait ()
 		--state;
 	pthread_mutex_unlock (&mutex);
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	WaitForSingleObject (event, INFINITE);
 
 #endif
@@ -192,7 +192,7 @@ void FCondition::wait ()
 //------------------------------------------------------------------------
 bool FCondition::waitTimeout (int32 milliseconds)
 {
-#if PTHREADS
+#if SMTG_PTHREADS
 	if (milliseconds == -1)
 	{ // infinite timeout
 		wait ();
@@ -244,7 +244,7 @@ bool FCondition::waitTimeout (int32 milliseconds)
 
 #endif
 
-#elif WINDOWS
+#elif SMTG_OS_WINDOWS
 	if (milliseconds == -1)
 		milliseconds = INFINITE;
 
@@ -253,7 +253,7 @@ bool FCondition::waitTimeout (int32 milliseconds)
 
 #endif
 
-#if !WINDOWS
+#if !SMTG_OS_WINDOWS
 	//	WARNING ("Return false on time out not implemented!")
 	return true;
 #endif
@@ -262,9 +262,9 @@ bool FCondition::waitTimeout (int32 milliseconds)
 //------------------------------------------------------------------------
 void FCondition::reset ()
 {
-#if WINDOWS
+#if SMTG_OS_WINDOWS
 	ResetEvent (event);
-#elif PTHREADS
+#elif SMTG_PTHREADS
 	state = 0;
 #endif
 }

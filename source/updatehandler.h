@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2017, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -80,6 +80,10 @@ public:
 	UpdateHandler ();
 	~UpdateHandler ();
 
+	using FObject::addDependent;
+	using FObject::removeDependent;
+	using FObject::deferUpdate;
+
 	// IUpdateHandler
 	/** register \param dependent to get messages from \param object */
 	virtual tresult PLUGIN_API addDependent (FUnknown* object, IDependent* dependent) SMTG_OVERRIDE;
@@ -99,7 +103,7 @@ public:
 
 	/// @cond ignore
 	// obsolete functions kept for compatibility
-	void checkUpdates (FObject* object = 0) { triggerDeferedUpdates (object->unknownCast ()); }
+	void checkUpdates (FObject* object = nullptr) { triggerDeferedUpdates (object->unknownCast ()); }
 	void flushUpdates (FObject* object) { cancelUpdates (object->unknownCast ()); }
 	void deferUpdate (FObject* object, int32 message)
 	{
@@ -115,7 +119,7 @@ public:
 	void printForObject (FObject* object) const;
 #endif
 	/// @endcond
-	size_t countDependencies (FUnknown* object = 0);
+	size_t countDependencies (FUnknown* object = nullptr);
 	
 	OBJ_METHODS (UpdateHandler, FObject)
 	FUNKNOWN_METHODS2 (IUpdateHandler, IUpdateManager, FObject)
@@ -125,7 +129,7 @@ private:
 	tresult doTriggerUpdates (FUnknown* object, int32 message, bool suppressUpdateDone);
 
 	Steinberg::Base::Thread::FLock lock;
-	Update::Table* table;
+	Update::Table* table = nullptr;
 	friend struct LockUpdateDependencies;
 	static bool lockUpdates;
 };

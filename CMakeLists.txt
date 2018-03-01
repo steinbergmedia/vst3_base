@@ -70,8 +70,14 @@ else()
 	add_library(base STATIC ${base_sources} ${base_sources_ext})
 endif()
 
+if(MSVC)
+	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /IGNORE:4221")
+endif()
+
+smtg_setup_universal_binary(base)
+
 # iOS target
-if(MAC AND XCODE AND IOS_DEVELOPMENT_TEAM)
+if(MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
 	add_library(base_ios STATIC ${base_sources})
 	smtg_set_platform_ios(base_ios)
 endif()
