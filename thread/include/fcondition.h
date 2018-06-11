@@ -65,7 +65,7 @@ public:
 	/** Condition constructor.
 	 *  @param name name of condition
 	 */
-	FCondition (const char8* name = 0 /* "FCondition" */ );
+	FCondition (const char8* name = nullptr /* "FCondition" */ );
 
 	/** Condition destructor.
 	 */

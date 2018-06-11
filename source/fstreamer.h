@@ -72,7 +72,7 @@ public:
 	/** @name Streams are byteOrder aware. */
 	///@{
 	inline void setByteOrder (int32 e) { byteOrder = (int16)e; }
-	inline int32 getByteOrder () { return byteOrder; }
+	inline int32 getByteOrder () const { return byteOrder; }
 	///@}
 
 	/** @name read and write int8 and char. */

@@ -70,7 +70,7 @@ extern "C" {
 
 #if SMTG_OS_MACOS
 #include <TargetConditionals.h>
-#if !TARGET_OS_IPHONE
+#if !SMTG_OS_IOS
 #include <CoreServices/CoreServices.h>
 #endif
 #endif
