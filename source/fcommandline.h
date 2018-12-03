@@ -63,7 +63,6 @@ The command-line parser uses CommandLine::Descriptions to define the available o
 int main (int argc, char* argv[])
 {
 	using namespace std;
-	using namespace Steinberg;
 
 	CommandLine::Descriptions desc;
 	CommandLine::VariablesMap valueMap;

@@ -77,7 +77,7 @@ endif()
 smtg_setup_universal_binary(base)
 
 # iOS target
-if(MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
 	add_library(base_ios STATIC ${base_sources})
 	smtg_set_platform_ios(base_ios)
 endif()
