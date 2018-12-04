@@ -326,5 +326,32 @@ Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 } // namespace Steinberg
 
 #elif SMTG_OS_LINUX
+
+#include <time.h>
+#include <cassert>
+
+namespace Steinberg {
+namespace SystemTime {
+/*
+    @return the current system time in milliseconds
+*/
+uint64 getTicks64 ()
+{
+	struct timespec ts;
+	clock_gettime (CLOCK_MONOTONIC, &ts);
+	return static_cast<uint64> (ts.tv_sec) * 1000 +
+		static_cast<uint64> (ts.tv_nsec / 1000000);
+}
+} // namespace SystemTime
+
+Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
+{
 #warning DEPRECATED No Linux implementation
+	assert(false && "DEPRECATED No Linux implementation");
+	return 0;
+}
+
+} // namespace Steinberg
+
+
 #endif
