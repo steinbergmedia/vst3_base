@@ -277,6 +277,8 @@ tresult PLUGIN_API UpdateHandler::removeDependent (FUnknown* u, IDependent* depe
 			{
 				Update::DependentList& list = (*iterMap).second;
 				Update::DependentListIter iterList = list.begin ();
+				bool listIsEmpty = false;
+				
 				while (iterList != list.end ())
 				{
 #if CLASS_NAME_TRACKED
@@ -285,14 +287,24 @@ tresult PLUGIN_API UpdateHandler::removeDependent (FUnknown* u, IDependent* depe
 					if ((*iterList) == dependent)
 #endif
 					{
-						iterList = list.erase (iterList);
+						if (list.size () == 1u)
+						{
+							listIsEmpty = true;
+							break;
+						}
+						else
+							iterList = list.erase (iterList);
 					}
 					else
 					{
 						++iterList;
 					}
 				}
-				++iterMap;
+				
+				if (listIsEmpty)
+					iterMap = map.erase (iterMap);
+				else
+					++iterMap;
 			}
 		}
 	}

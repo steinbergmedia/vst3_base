@@ -85,7 +85,7 @@ public:
 
 	/**	Destructor - deallocates the internal memory.
 	*/
-	~Buffer ();
+	virtual ~Buffer ();
 	
 	/**	Assignment operator - copies contents from a given Buffer and increases the size if necessary.
 	\param[in] buff : the Buffer from which all memory will be copied

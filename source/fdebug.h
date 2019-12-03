@@ -212,11 +212,9 @@ void* operator new (size_t, int, const char*, int);
 #endif
 #endif
 
-#if SMTG_CPPUNIT_TESTING
-#define SMTG_IS_TEST true
-#else
-#define SMTG_IS_TEST false
-#endif
+// replace #if SMTG_CPPUNIT_TESTING
+bool isSmtgUnitTesting ();
+void setSmtgUnitTesting ();
 
 #if !SMTG_RENAME_ASSERT
 #if SMTG_OS_WINDOWS

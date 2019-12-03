@@ -144,7 +144,7 @@ MacPlatformTimer::MacPlatformTimer (ITimerCallback* callback, uint32 millisecond
 {
 	if (callback)
 	{
-		CFRunLoopTimerContext timerContext = {0};
+		CFRunLoopTimerContext timerContext = {};
 		timerContext.info = this;
 		platformTimer = CFRunLoopTimerCreate (kCFAllocatorDefault, CFAbsoluteTimeGetCurrent () + milliseconds * 0.001, milliseconds * 0.001f, 0, 0, timerCallback, &timerContext);
 		if (platformTimer)

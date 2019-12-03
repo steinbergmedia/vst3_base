@@ -187,7 +187,7 @@ void FDebugBreak (const char* format, ...)
 
 		if (breakIntoDebugger)
 		{
-#if SMTG_OS_WINDOWS
+#if SMTG_OS_WINDOWS			
 			__debugbreak (); // intrinsic version of DebugBreak()
 #elif __ppc64__ || __ppc__ || __arm__
 			kill (getpid (), SIGINT);
@@ -312,3 +312,17 @@ bool AmIBeingDebugged (void)
 #endif // SMTG_OS_MACOS
 
 #endif // DEVELOPMENT
+
+static bool smtg_unit_testing_active = false; // ugly hack to unit testing ...
+
+//------------------------------------------------------------------------
+bool isSmtgUnitTesting ()
+{
+	return smtg_unit_testing_active;
+}
+
+//------------------------------------------------------------------------
+void setSmtgUnitTesting ()
+{
+	smtg_unit_testing_active = true;
+}

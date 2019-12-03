@@ -361,7 +361,7 @@ bool Buffer::fromHexString (const char8* string)
 		else return false; // no hex string
 
 		if (upper)
-			data [count >> 1] = d << 4;
+			data [count >> 1] = static_cast<unsigned char> (d << 4);
 		else
 			data [count >> 1] += d;
 

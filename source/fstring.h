@@ -307,6 +307,7 @@ Extends class ConstString by operations which allow modifications.
 class String : public ConstString
 {
 public:
+	
 //-----------------------------------------------------------------------------
 	String ();
 	String (const char8* str, MBCodePage codepage, int32 n = -1, bool isTerminated = true);							///< assign n characters of str and convert to wide string by using the specified codepage
