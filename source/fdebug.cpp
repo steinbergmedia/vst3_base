@@ -11,7 +11,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2019, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -78,27 +78,6 @@ mach_port_t watchThreadID = 0;
 AssertionHandler gAssertionHandler = nullptr;
 AssertionHandler gPreAssertionHook = nullptr;
 DebugPrintLogger gDebugPrintLogger = nullptr;
-
-namespace boost {
-// Define the boost assertion handler to redirect to our assertion handler,
-// otherwise it just calls abort(). Note that we don't need to include any boost
-// headers for this, it just provides the handler.
-void assertion_failed (char const* expr, char const* function, char const* file, long line)
-{
-#if DEVELOPMENT
-	char message[512];
-	snprintf (message, 512, "%s at %s, %s:%ld", expr, function, file, line);
-	if (gAssertionHandler)
-	{
-		FDebugBreak (message);
-	}
-	else
-	{
-		assert (!(const char *)message);
-	}
-#endif
-}
-}
 
 //--------------------------------------------------------------------------
 static const int kDebugPrintfBufferSize = 10000;

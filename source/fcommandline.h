@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2019, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -218,7 +218,6 @@ namespace CommandLine {
 		@param[in] help a help description for this option.
 		@param[out] valueType Description::kBool or Description::kString.
 	*/
-	//------------------------------------------------------------------------
 	Description::Description (const std::string& name, const std::string& help, const std::string& valueType)
 	: std::string (name)
 	, mHelp (help)
@@ -226,20 +225,20 @@ namespace CommandLine {
 	{
 	}
 
-	//------------------------------------------------------------------------
-	/*! Returning a reverence to *this, enables chaining of calls to operator()(const std::string&, const std::string&).
-	 
-		@param[in] name of the added option.
-		@param[in] help a help description for this option.
-		@return a reverence to *this.
-	*/
-	Descriptions& Descriptions::operator() (const std::string& name, const std::string& help)
-	{
-		mDescriptions.push_back (Description (name, help, Description::kBool));
-		return *this;
-	}
-	
-	//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+    /*! Returning a reference to *this, enables chaining of calls to operator()(const std::string&,
+     const std::string&).
+        @param[in] name of the added option.
+        @param[in] help a help description for this option.
+        @return a reference to *this.
+    */
+    Descriptions& Descriptions::operator () (const std::string& name, const std::string& help)
+    {
+	    mDescriptions.push_back (Description (name, help, Description::kBool));
+	    return *this;
+    }
+
+//------------------------------------------------------------------------
 	/*!	<b>Usage example:</b>
 																@code
 	CommandLine::Descriptions desc;
@@ -262,10 +261,9 @@ namespace CommandLine {
 	);
 																@endcode
 	@param[in] caption the caption of the command-line tool.
-	@param[in|optional] options initializer list with options
+	@param[in] options initializer list with options
 	@return a reverense to *this.
 	*/
-	//------------------------------------------------------------------------
     Descriptions& Descriptions::addOptions (const std::string& caption,
                                             std::initializer_list<Description>&& options)
     {
@@ -280,7 +278,6 @@ namespace CommandLine {
 		@param[out] result the parsing result
 		@param[out] files optional list of elements on the command line that are not handled by options parsing
 	*/
-	//------------------------------------------------------------------------
 	bool Descriptions::parse (int ac, char* av[], VariablesMap& result, FilesVector* files) const
 	{
 		using namespace std;
@@ -341,7 +338,7 @@ namespace CommandLine {
 		{
 			const Description& opt = mDescriptions[i];
 			os << "-" << opt;
-			for (auto i = opt.size (); i < maxLength; ++i)
+			for (auto s = opt.size (); s < maxLength; ++s)
 				os << " ";
 			os << " | " << opt.mHelp << "\n";
 		}
