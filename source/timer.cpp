@@ -88,37 +88,41 @@ int32 getTicks ()
 #endif
 
 namespace Steinberg {
-
 namespace SystemTime {
-	struct MachTimeBase {
-	private:
-		struct mach_timebase_info timebaseInfo;
 
-		MachTimeBase ()
-		{
-			mach_timebase_info (&timebaseInfo);
-		}
+//------------------------------------------------------------------------
+struct MachTimeBase
+{
+private:
+	struct mach_timebase_info timebaseInfo;
 
-		static const MachTimeBase& instance ()
-		{
-			static MachTimeBase gInstance;
-			return gInstance;
-		}
-	public:
-		static double getTimeNanos ()
-		{
-			const MachTimeBase& timeBase = instance ();
-			double absTime = static_cast<double> (mach_absolute_time ());
-			double d = (absTime / timeBase.timebaseInfo.denom) * timeBase.timebaseInfo.numer;	// nano seconds
-			return d;
-		}
-	};
+	MachTimeBase () { mach_timebase_info (&timebaseInfo); }
 
-	//------------------------------------------------------------------------
-	uint64 getTicks64 ()
+	static const MachTimeBase& instance ()
 	{
-		return static_cast<uint64> (MachTimeBase::getTimeNanos () / 1000000.);
+		static MachTimeBase gInstance;
+		return gInstance;
 	}
+
+public:
+	static double getTimeNanos ()
+	{
+		const MachTimeBase& timeBase = instance ();
+		double absTime = static_cast<double> (mach_absolute_time ());
+		// nano seconds
+		double d = (absTime / timeBase.timebaseInfo.denom) * timeBase.timebaseInfo.numer;
+		return d;
+	}
+};
+
+/*
+	@return the current system time in milliseconds
+*/
+uint64 getTicks64 ()
+{
+	return static_cast<uint64> (MachTimeBase::getTimeNanos () / 1000000.);
+}
+//------------------------------------------------------------------------
 } // namespace SystemTime
 
 //------------------------------------------------------------------------
@@ -131,7 +135,8 @@ public:
 	void stop ();
 	bool verify () const { return platformTimer != 0; }
 
-	static void timerCallback (CFRunLoopTimerRef timer, void *info);
+	static void timerCallback (CFRunLoopTimerRef timer, void* info);
+
 protected:
 	CFRunLoopTimerRef platformTimer;
 	ITimerCallback* callback;
@@ -139,14 +144,15 @@ protected:
 
 //------------------------------------------------------------------------
 MacPlatformTimer::MacPlatformTimer (ITimerCallback* callback, uint32 milliseconds)
-: platformTimer (0)
-, callback (callback)
+: platformTimer (0), callback (callback)
 {
 	if (callback)
 	{
 		CFRunLoopTimerContext timerContext = {};
 		timerContext.info = this;
-		platformTimer = CFRunLoopTimerCreate (kCFAllocatorDefault, CFAbsoluteTimeGetCurrent () + milliseconds * 0.001, milliseconds * 0.001f, 0, 0, timerCallback, &timerContext);
+		platformTimer = CFRunLoopTimerCreate (
+		    kCFAllocatorDefault, CFAbsoluteTimeGetCurrent () + milliseconds * 0.001,
+		    milliseconds * 0.001f, 0, 0, timerCallback, &timerContext);
 		if (platformTimer)
 			CFRunLoopAddTimer (CFRunLoopGetMain (), platformTimer, kCFRunLoopCommonModes);
 	}
@@ -170,7 +176,7 @@ void MacPlatformTimer::stop ()
 }
 
 //------------------------------------------------------------------------
-void MacPlatformTimer::timerCallback (CFRunLoopTimerRef , void *info)
+void MacPlatformTimer::timerCallback (CFRunLoopTimerRef, void* info)
 {
 	if (timersEnabled)
 	{
@@ -189,30 +195,36 @@ Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 	if (timer->verify ())
 		return timer;
 	timer->release ();
-	return 0;
+	return nullptr;
 }
-
-}
+//------------------------------------------------------------------------
+} // namespace Steinberg
 
 #elif SMTG_OS_WINDOWS
 
-#include <windows.h>
-#include <list>
+#include <Windows.h>
 #include <algorithm>
+#include <list>
 
 namespace Steinberg {
 namespace SystemTime {
+
+//------------------------------------------------------------------------
 /*
     @return the current system time in milliseconds
 */
 uint64 getTicks64 ()
 {
+#if defined(__MINGW32__)
+	return GetTickCount ();
+#else
 	return GetTickCount64 ();
+#endif
 }
 }
 
 class WinPlatformTimer;
-typedef std::list<WinPlatformTimer*> WinPlatformTimerList;
+using WinPlatformTimerList = std::list<WinPlatformTimer*>;
 
 //------------------------------------------------------------------------
 // WinPlatformTimer
@@ -224,8 +236,8 @@ public:
 	WinPlatformTimer (ITimerCallback* callback, uint32 milliseconds);
 	~WinPlatformTimer ();
 
-	void stop ();
-	bool verify () const {return id != 0;}
+	void stop () override;
+	bool verify () const { return id != 0; }
 
 //------------------------------------------------------------------------
 private:
@@ -240,13 +252,13 @@ private:
 };
 
 //------------------------------------------------------------------------
-WinPlatformTimerList* WinPlatformTimer::timers = 0;
+WinPlatformTimerList* WinPlatformTimer::timers = nullptr;
 
 //------------------------------------------------------------------------
 WinPlatformTimer::WinPlatformTimer (ITimerCallback* callback, uint32 milliseconds)
 : callback (callback)
 {
-	id = SetTimer (0, 0, milliseconds, TimerProc);
+	id = SetTimer (nullptr, 0, milliseconds, TimerProc);
 	if (id)
 		addTimer (this);
 }
@@ -260,7 +272,7 @@ WinPlatformTimer::~WinPlatformTimer ()
 //------------------------------------------------------------------------
 void WinPlatformTimer::addTimer (WinPlatformTimer* t)
 {
-	if (timers == 0)
+	if (timers == nullptr)
 		timers = NEW WinPlatformTimerList;
 	timers->push_back (t);
 }
@@ -277,7 +289,7 @@ void WinPlatformTimer::removeTimer (WinPlatformTimer* t)
 	if (timers->empty ())
 	{
 		delete timers;
-		timers = 0;
+		timers = nullptr;
 	}
 }
 
@@ -287,19 +299,20 @@ void WinPlatformTimer::stop ()
 	if (!id)
 		return;
 
-	KillTimer (0, id);
+	KillTimer (nullptr, id);
 	removeTimer (this);
 	id = 0;
 }
 
 //------------------------------------------------------------------------
-void CALLBACK WinPlatformTimer::TimerProc (HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR idEvent, DWORD /*dwTime*/)
+void CALLBACK WinPlatformTimer::TimerProc (HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR idEvent,
+                                           DWORD /*dwTime*/)
 {
 	if (timersEnabled && timers)
 	{
 		WinPlatformTimerList::const_iterator it = timers->cbegin ();
 		while (it != timers->cend ())
-		{	
+		{
 			WinPlatformTimer* timer = *it;
 			if (timer->id == idEvent)
 			{
@@ -315,16 +328,46 @@ void CALLBACK WinPlatformTimer::TimerProc (HWND /*hwnd*/, UINT /*uMsg*/, UINT_PT
 //------------------------------------------------------------------------
 Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 {
-	WinPlatformTimer* platformTimer = NEW WinPlatformTimer (callback, milliseconds);
+	auto* platformTimer = NEW WinPlatformTimer (callback, milliseconds);
 	if (platformTimer->verify ())
 		return platformTimer;
 	platformTimer->release ();
-	return 0;
+	return nullptr;
 }
 
 //------------------------------------------------------------------------
 } // namespace Steinberg
 
 #elif SMTG_OS_LINUX
+
+#include <cassert>
+#include <time.h>
+
+namespace Steinberg {
+namespace SystemTime {
+
+//------------------------------------------------------------------------
+/*
+    @return the current system time in milliseconds
+*/
+uint64 getTicks64 ()
+{
+	struct timespec ts;
+	clock_gettime (CLOCK_MONOTONIC, &ts);
+	return static_cast<uint64> (ts.tv_sec) * 1000 + static_cast<uint64> (ts.tv_nsec) / 1000000;
+}
+//------------------------------------------------------------------------
+} // namespace SystemTime
+
+//------------------------------------------------------------------------
+Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
+{
 #warning DEPRECATED No Linux implementation
+	assert (false && "DEPRECATED No Linux implementation");
+	return nullptr;
+}
+
+//------------------------------------------------------------------------
+} // namespace Steinberg
+
 #endif

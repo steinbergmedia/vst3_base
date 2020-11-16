@@ -58,27 +58,21 @@ inline uint64 getTicksDuration (uint64 old, uint64 now)
 int32 getTicks (); ///< deprecated, use getTicks64 ()
 
 //------------------------------------------------------------------------
-} // SystemTime
+} // namespace SystemTime
 
 //------------------------------------------------------------------------
 /** @class ITimerCallback
-    
 
     Implement this callback interface to receive triggers from a timer.
-    Note: This interface is intended as a mix-in class and therefore does not provide refcounting.
-    
+    Note: This interface is intended as a mix-in class and therefore does not provide ref-counting.
 
     @see Timer */
-//------------------------------------------------------------------------
 class ITimerCallback
 {
 public:
 	virtual ~ITimerCallback () {}
 	/** This method is called at the end of each interval.
-	    
-
-	    \param timer The timer which calls.
-	*/
+	    \param timer The timer which calls. */
 	virtual void onTimer (Timer* timer) = 0;
 };
 
@@ -98,10 +92,7 @@ ITimerCallback* newTimerCallback (const Call& call)
 /** @class Timer
 
     Timer is a class that allows you to receive triggers at regular intervals.
-
     Note: The timer class is an abstract base class with (hidden) platform specific subclasses.
-
-
 
     Usage:
     @code
@@ -117,8 +108,7 @@ ITimerCallback* newTimerCallback (const Call& call)
 
     TimerReceiver* receiver =  new TimerReceiver ();
     Timer* myTimer = Timer::create (receiver, 100); // interval: every 100ms
-    
-
+  
     ...
     ...
 
@@ -129,8 +119,7 @@ ITimerCallback* newTimerCallback (const Call& call)
     @endcode
 
     @see ITimerCallback
-    */
-// -----------------------------------------------------------------
+ */
 class Timer : public FObject
 {
 public:
@@ -148,9 +137,7 @@ public:
 /** @class DisableDispatchingTimers
 
     Disables dispatching of timers for the live time of this object
-
-    */
-// -----------------------------------------------------------------
+*/
 class DisableDispatchingTimers
 {
 public:

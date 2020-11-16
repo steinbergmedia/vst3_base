@@ -50,7 +50,7 @@
 #define _WIN32_WINNT WINVER
 #endif
 
-#include <windows.h>
+#include <Windows.h>
 #include <objbase.h>
 #define INIT_CS(cs) \
 	InitializeCriticalSection ((LPCRITICAL_SECTION)&cs);

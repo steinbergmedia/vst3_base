@@ -40,7 +40,7 @@
 #include "base/source/fstring.h"
 
 #if SMTG_OS_WINDOWS
-#include <windows.h>
+#include <Windows.h>
 
 #elif SMTG_OS_MACOS
 #include <mach-o/dyld.h>

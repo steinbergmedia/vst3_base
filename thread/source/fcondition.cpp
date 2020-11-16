@@ -78,7 +78,7 @@ extern "C" {
 #include <sys/time.h>
 //------------------------------------------------------------------------
 #elif SMTG_OS_WINDOWS
-#include <windows.h>
+#include <Windows.h>
 #endif
 
 namespace Steinberg {

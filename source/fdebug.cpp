@@ -49,8 +49,10 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
 #endif
+#if _MSC_VER
 #include <intrin.h>
-#include <windows.h>
+#endif
+#include <Windows.h>
 #define vsnprintf _vsnprintf
 #define snprintf _snprintf
 
@@ -95,7 +97,7 @@ static void printDebugString (const char* string)
 	}
 	else
 	{
-#if SMTG_OS_MACOS
+#if SMTG_OS_MACOS || defined(__MINGW32__)
 		fprintf (stderr, "%s", string);
 #elif SMTG_OS_WINDOWS
 		OutputDebugStringA (string);
@@ -166,7 +168,7 @@ void FDebugBreak (const char* format, ...)
 
 		if (breakIntoDebugger)
 		{
-#if SMTG_OS_WINDOWS			
+#if SMTG_OS_WINDOWS	&& _MSC_VER
 			__debugbreak (); // intrinsic version of DebugBreak()
 #elif __ppc64__ || __ppc__ || __arm__
 			kill (getpid (), SIGINT);

@@ -47,7 +47,8 @@
 #include <utility>
 
 #if SMTG_OS_WINDOWS
-#include <windows.h>
+#include <Windows.h>
+#ifdef _MSC_VER
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4267)
 #pragma warning (disable : 4996)
@@ -59,9 +60,9 @@
 #define realloc(p,s) _realloc_dbg(p,s,  _NORMAL_BLOCK, __FILE__, __LINE__)
 #define free(p) _free_dbg(p, _NORMAL_BLOCK)
 
-#endif
-
-#endif
+#endif // DEVELOPMENT
+#endif // _MSC_VER
+#endif // SMTG_OS_WINDOWS
 
 #ifndef kPrintfBufferSize
 #define kPrintfBufferSize 4096
@@ -175,7 +176,7 @@ static CFStringDebugAllocator gDebugAllocator;
 #else
 
 static const CFAllocatorRef kCFAllocator = ::kCFAllocatorDefault;
-#endif
+#endif // SMTG_DEBUG_CFALLOCATOR
 }
 
 //-----------------------------------------------------------------------------
@@ -416,7 +417,7 @@ static inline Steinberg::int32 sprintf16 (Steinberg::char16* str, const Steinber
 	return vsnwprintf (str, -1, format, marker);
 }
 
-#endif
+#endif // SMTG_OS_LINUX
 
 /*
 UTF-8                EF BB BF 
@@ -2526,7 +2527,7 @@ String& String::assign (const char8* str, int32 n, bool isTerminated)
 
 	if (resize (n, false))
 	{
-		if (buffer8 && n > 0)
+		if (buffer8 && n > 0 && str)
 		{
 			memcpy (buffer8, str, n * sizeof (char8));
 			SMTG_ASSERT (buffer8[n] == 0)
@@ -2553,7 +2554,7 @@ String& String::assign (const char16* str, int32 n, bool isTerminated)
 
 	if (resize (n, true))
 	{
-		if (buffer16 && n > 0)
+		if (buffer16 && n > 0 && str)
 		{
 			memcpy (buffer16, str, n * sizeof (char16));
 			SMTG_ASSERT (buffer16[n] == 0)
@@ -2634,7 +2635,7 @@ String& String::append (const char8* str, int32 n)
 		if (!resize (newlen, false))
 			return *this;
 
-		if (buffer)
+		if (buffer && str)
 		{
 			memcpy (buffer8 + len, str, n * sizeof (char8));
 			SMTG_ASSERT (buffer8[newlen] == 0)
@@ -2669,7 +2670,7 @@ String& String::append (const char16* str, int32 n)
 		if (!resize (newlen, true))
 			return *this;
 
-		if (buffer16)
+		if (buffer16 && str)
 		{
 			memcpy (buffer16 + len, str, n * sizeof (char16));
 			SMTG_ASSERT (buffer16[newlen] == 0)
@@ -2778,7 +2779,7 @@ String& String::insertAt (uint32 idx, const char8* str, int32 n)
 		if (!resize (newlen, false))
 			return *this;
 
-		if (buffer)
+		if (buffer && str)
 		{
 			if (idx < len)
 				memmove (buffer8 + idx + n, buffer8 + idx, (len - idx) * sizeof (char8));
@@ -2812,7 +2813,7 @@ String& String::insertAt (uint32 idx, const char16* str, int32 n)
 		if (!resize (newlen, true))
 			return *this;
 
-		if (buffer)
+		if (buffer && str)
 		{
 			if (idx < len)
 				memmove (buffer16 + idx + n, buffer16 + idx, (len - idx) * sizeof (char16));

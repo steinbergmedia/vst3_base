@@ -77,6 +77,14 @@ target_include_directories(base
         ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
+# Compiler switches are PUBLIC and will be populated.
+target_compile_options(base 
+    PUBLIC
+        "$<$<CONFIG:Debug>:-DDEVELOPMENT=1>"
+        "$<$<CONFIG:Release>:-DRELEASE=1>"
+        "$<$<CONFIG:RelWithDebInfo>:-DRELEASE=1>"
+)
+
 if(MSVC)
     set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /IGNORE:4221")
 endif()
@@ -86,6 +94,17 @@ smtg_setup_universal_binary(base)
 # iOS target
 if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
     get_target_property(BASE_SOURCES base SOURCES)
-    add_library(base_ios STATIC ${BASE_SOURCES})
+    add_library(base_ios
+        STATIC
+            ${BASE_SOURCES}
+    )
     smtg_set_platform_ios(base_ios)
+    
+    # Compiler switches are PUBLIC and will be populated.
+    target_compile_options(base_ios 
+        PUBLIC
+            "$<$<CONFIG:Debug>:-DDEVELOPMENT=1>"
+            "$<$<CONFIG:Release>:-DRELEASE=1>"
+            "$<$<CONFIG:RelWithDebInfo>:-DRELEASE=1>"
+    )
 endif()
