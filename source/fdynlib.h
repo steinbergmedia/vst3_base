@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -66,7 +66,7 @@ public:
 		  FDynLibrary uses a standard search strategy of the current platform to find the library; 
 		- If @c name is @c NULL the library is not loaded. 
 		  - Use init() to load the library. */
-	FDynLibrary (const tchar* name = 0, bool addExtension = true);
+	FDynLibrary (const tchar* name = nullptr, bool addExtension = true);
 	
 	/** Destructor.
 		The destructor unloads the library.*/

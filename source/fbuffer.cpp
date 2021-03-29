@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@
 
 #include "base/source/fbuffer.h"
 #include "base/source/fstring.h"
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace Steinberg {
 
@@ -231,7 +231,6 @@ bool Buffer::prependString8 (const char8* s)
 		return false;
 
 	uint32 len = (uint32) strlen (s);
-	
 	if (len > 0)
 	{
 		shiftStart (len);

@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -40,7 +40,7 @@
 #include "base/source/fstring.h"
 
 #if SMTG_OS_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 
 #elif SMTG_OS_MACOS
 #include <mach-o/dyld.h>
@@ -83,7 +83,7 @@ static bool CopyProcessPath (Steinberg::String& name)
 //------------------------------------------------------------------------
 FDynLibrary::FDynLibrary (const tchar* n, bool addExtension)
 : isloaded (false)
-, instance (0)
+, instance (nullptr)
 {
 	if (n)
 		init (n, addExtension);
@@ -214,11 +214,10 @@ bool FDynLibrary::unload ()
 		}*/
 	}
 #endif
-	instance = 0;
+	instance = nullptr;
 	isloaded = false;
 	return true;
 }
-
 
 //------------------------------------------------------------------------
 void* FDynLibrary::getProcAddress (const char* name)

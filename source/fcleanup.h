@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@
 
 #pragma once
 
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace Steinberg {
 
@@ -187,7 +187,7 @@ struct FBooleanSetter
 	T& toSet; ///< Remembers the boolean that is to be reset during destruction.
 };
 
-typedef FBooleanSetter<bool> FBoolSetter;
+using FBoolSetter = FBooleanSetter<bool>;
 
 /** Class definition for objects that help setting boolean variables.
 A stack allocated object of this type automatically sets an at construction time passed

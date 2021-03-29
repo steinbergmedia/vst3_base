@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@
 #include <utility>
 
 #if SMTG_OS_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #ifdef _MSC_VER
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4267)
@@ -470,7 +470,7 @@ ConstString::ConstString (const ConstString& str, int32 offset, int32 length)
 
 //-----------------------------------------------------------------------------
 ConstString::ConstString (const FVariant& var)
-: buffer (0)
+: buffer (nullptr)
 , len (0)
 , isWide (0) 
 {
@@ -492,7 +492,7 @@ ConstString::ConstString (const FVariant& var)
 
 //-----------------------------------------------------------------------------
 ConstString::ConstString ()
-: buffer (0)
+: buffer (nullptr)
 , len (0)
 , isWide (0) 
 {
@@ -1861,7 +1861,7 @@ static CFStringEncoding MBCodePageToCFStringEncoding (uint32 codePage)
 //-----------------------------------------------------------------------------
 int32 ConstString::multiByteToWideString (char16* dest, const char8* source, int32 charCount, uint32 sourceCodePage)
 {
-	if (source == 0 || source[0] == 0)
+	if (source == nullptr || source[0] == 0)
 	{
 		if (dest && charCount > 0)
 		{
@@ -1929,7 +1929,7 @@ int32 ConstString::multiByteToWideString (char16* dest, const char8* source, int
 int32 ConstString::wideStringToMultiByte (char8* dest, const char16* wideString, int32 charCount, uint32 destCodePage)
 {
 #if SMTG_OS_WINDOWS
-	return WideCharToMultiByte (destCodePage, 0, wideString, -1, dest, charCount, 0, 0);
+	return WideCharToMultiByte (destCodePage, 0, wideString, -1, dest, charCount, nullptr, nullptr);
 
 #elif SMTG_OS_MACOS
 	int32 result = 0;
@@ -2019,7 +2019,7 @@ bool ConstString::isNormalized (UnicodeNormalization n)
 #ifdef UNICODE
 	if (n != kUnicodeNormC)
 		return false;
-	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, buffer16, len, 0, 0));
+	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, buffer16, len, nullptr, 0));
 	return (normCharCount == len);
 #else
 	return false; 
@@ -2122,7 +2122,7 @@ String::String (String&& str)
 //-----------------------------------------------------------------------------
 String& String::operator= (String&& str)
 {
-	SMTG_ASSERT (buffer == 0 || buffer != str.buffer);
+	SMTG_ASSERT (buffer == nullptr || buffer != str.buffer);
 	tryFreeBuffer ();
 	
 	isWide = str.isWide;
@@ -2150,7 +2150,7 @@ bool String::toWideString (uint32 sourceCodePage)
 	{
 		if (buffer8 && len > 0)
 		{
-			int32 bytesNeeded = multiByteToWideString (0, buffer8, 0, sourceCodePage) * sizeof (char16);
+			int32 bytesNeeded = multiByteToWideString (nullptr, buffer8, 0, sourceCodePage) * sizeof (char16);
 			if (bytesNeeded)
 			{
 				bytesNeeded += sizeof (char16);
@@ -2234,7 +2234,7 @@ bool String::toMultiByte (uint32 destCodePage)
 	{
 		if (buffer16 && len > 0)
 		{
-			int32 numChars = wideStringToMultiByte (0, buffer16, 0, destCodePage) + sizeof (char8);
+			int32 numChars = wideStringToMultiByte (nullptr, buffer16, 0, destCodePage) + sizeof (char8);
 			char8* newStr = (char8*) malloc (numChars * sizeof (char8));
 			if (wideStringToMultiByte (newStr, buffer16, numChars, destCodePage) <= 0)
 			{
@@ -2270,7 +2270,7 @@ bool String::normalize (UnicodeNormalization n)
 	if (isWide == false)
 		return false;
 
-	if (buffer16 == 0)
+	if (buffer16 == nullptr)
 		return true;
 
 #if SMTG_OS_WINDOWS
@@ -2278,7 +2278,7 @@ bool String::normalize (UnicodeNormalization n)
 	if (n != kUnicodeNormC)
 		return false;
 
-	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, buffer16, len, 0, 0));
+	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, buffer16, len, nullptr, 0));
 	if (normCharCount == len)
 		return true;
 
@@ -2327,7 +2327,7 @@ void String::tryFreeBuffer ()
 	if (buffer)
 	{
 		free (buffer);
-		buffer = 0;
+		buffer = nullptr;
 	}
 }
 
@@ -2355,7 +2355,7 @@ bool String::resize (uint32 newLength, bool wide, bool fill)
 			if (newBufferSize != oldBufferSize)
 			{
 				void* newstr = realloc (buffer, newBufferSize);
-				if (newstr == 0)
+				if (newstr == nullptr)
 					return false;
 				buffer = newstr;
 				if (isWide)
@@ -2369,7 +2369,7 @@ bool String::resize (uint32 newLength, bool wide, bool fill)
 		else
 		{
 			void* newstr = malloc (newBufferSize);
-			if (newstr == 0)
+			if (newstr == nullptr)
 				return false;
 			buffer = newstr;
 			if (isWide)
@@ -2840,7 +2840,7 @@ String& String::replace (uint32 idx, int32 n1, const ConstString& str, int32 n2)
 //-----------------------------------------------------------------------------
 String& String::replace (uint32 idx, int32 n1, const char8* str, int32 n2)
 {
-	if (idx > len || str == 0)
+	if (idx > len || str == nullptr)
 		return *this;
 
 	if (isWide)
@@ -2881,7 +2881,7 @@ String& String::replace (uint32 idx, int32 n1, const char8* str, int32 n2)
 //-----------------------------------------------------------------------------
 String& String::replace (uint32 idx, int32 n1, const char16* str, int32 n2)
 {
-	if (idx > len || str == 0)
+	if (idx > len || str == nullptr)
 		return *this;
 
 	if (!isWide)
@@ -2918,7 +2918,7 @@ String& String::replace (uint32 idx, int32 n1, const char16* str, int32 n2)
 //-----------------------------------------------------------------------------
 int32 String::replace (const char8* toReplace, const char8* toReplaceWith, bool all, CompareMode m)
 {
-	if (toReplace == 0 || toReplaceWith == 0)
+	if (toReplace == nullptr || toReplaceWith == nullptr)
 		return 0;
 
 	int32 result = 0;
@@ -2946,7 +2946,7 @@ int32 String::replace (const char8* toReplace, const char8* toReplaceWith, bool 
 //-----------------------------------------------------------------------------
 int32 String::replace (const char16* toReplace, const char16* toReplaceWith, bool all, CompareMode m)
 {
-	if (toReplace == 0 || toReplaceWith == 0)
+	if (toReplace == nullptr || toReplaceWith == nullptr)
 		return 0;
 
 	int32 result = 0;
@@ -3271,7 +3271,7 @@ static uint32 performRemoveChars (T* str, uint32 length, const T* toRemove)
 //-----------------------------------------------------------------------------
 bool String::removeChars8 (const char8* toRemove)
 {
-	if (isEmpty () || toRemove == 0)
+	if (isEmpty () || toRemove == nullptr)
 		return true;
 
 	if (isWide)
@@ -3295,7 +3295,7 @@ bool String::removeChars8 (const char8* toRemove)
 //-----------------------------------------------------------------------------
 bool String::removeChars16 (const char16* toRemove)
 {
-	if (isEmpty () || toRemove == 0)
+	if (isEmpty () || toRemove == nullptr)
 		return true;
 
 	if (!isWide)
@@ -3656,7 +3656,7 @@ void String::take (String& other)
 	buffer = other.buffer;
 	len = other.len;
 
-	other.buffer = 0;
+	other.buffer = nullptr;
 	other.len = 0;
 }
 
@@ -3674,7 +3674,7 @@ void* String::pass ()
 {
 	void* res = buffer;
 	len = 0;
-	buffer = 0;
+	buffer = nullptr;
 	return res;
 }
 
@@ -3864,11 +3864,11 @@ uint32 hashString16 (const char16* s, uint32 m)
 //------------------------------------------------------------------------
 template <class T> int32 tstrnatcmp (const T* s1, const T* s2, bool caseSensitive = true)
 {
-	if (s1 == 0 && s2 == 0)
+	if (s1 == nullptr && s2 == nullptr)
 		return 0;
-	else if (s1 == 0)
+	else if (s1 == nullptr)
 		return -1;
-	else if (s2 == 0)
+	else if (s2 == nullptr)
 		return 1;
 
 	while (*s1 && *s2)

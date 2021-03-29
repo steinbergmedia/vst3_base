@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -210,7 +210,7 @@ public:
 
 	int8* operator + (uint32 i);	///< \return the internal Buffer's address plus the given offset i, zero if offset is out of range
 	
-	int32 operator ! ()  { return buffer == 0; }
+	int32 operator ! ()  { return buffer == nullptr; }
 	
 	enum swapSize 
 	{

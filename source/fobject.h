@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -97,12 +97,12 @@ public:
 	FUnknown* unknownCast () {return this;}									///< get FUnknown interface from object
 
 	// FUnknown
-	virtual tresult PLUGIN_API queryInterface (const TUID _iid, void** obj) SMTG_OVERRIDE; ///< please refer to FUnknown::queryInterface ()
-	virtual uint32 PLUGIN_API addRef () SMTG_OVERRIDE;						///< please refer to FUnknown::addref ()
-	virtual uint32 PLUGIN_API release () SMTG_OVERRIDE;						///< please refer to FUnknown::release ()
+	tresult PLUGIN_API queryInterface (const TUID _iid, void** obj) SMTG_OVERRIDE; ///< please refer to FUnknown::queryInterface ()
+	uint32 PLUGIN_API addRef () SMTG_OVERRIDE;						///< please refer to FUnknown::addref ()
+	uint32 PLUGIN_API release () SMTG_OVERRIDE;						///< please refer to FUnknown::release ()
 
 	// IDependent
-	virtual void PLUGIN_API update (FUnknown* /*changedUnknown*/, int32 /*message*/) SMTG_OVERRIDE {}
+	void PLUGIN_API update (FUnknown* /*changedUnknown*/, int32 /*message*/) SMTG_OVERRIDE {}
 																			///< empty virtual method that should be overridden by derived classes for data updates upon changes	
 	// IDependency
 	virtual void addDependent (IDependent* dep);							///< adds dependency to the object

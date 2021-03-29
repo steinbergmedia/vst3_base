@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -40,8 +40,8 @@
 #include "base/thread/include/fcondition.h"
 #include "base/source/fdebug.h"
 
-#include <limits.h>
-#include <stdlib.h>
+#include <climits>
+#include <cstdlib>
 
 //------------------------------------------------------------------------
 #if SMTG_PTHREADS
@@ -78,7 +78,7 @@ extern "C" {
 #include <sys/time.h>
 //------------------------------------------------------------------------
 #elif SMTG_OS_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 namespace Steinberg {
@@ -103,7 +103,7 @@ FCondition::FCondition (const char8* name)
 
 #elif SMTG_OS_WINDOWS
 	// use name if existing
-	event = CreateEventA (0, FALSE, FALSE, name);
+	event = CreateEventA (nullptr, FALSE, FALSE, name);
 
 #endif
 }

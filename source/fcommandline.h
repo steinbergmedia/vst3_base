@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2020, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -42,13 +42,13 @@
 //------------------------------------------------------------------------
 #pragma once
 
-#include <deque>
-#include <map>
-#include <vector>
 #include <algorithm>
-#include <sstream>
+#include <deque>
 #include <initializer_list>
 #include <iterator>
+#include <map>
+#include <sstream>
+#include <vector>
 
 namespace Steinberg {
 //------------------------------------------------------------------------
@@ -113,7 +113,7 @@ namespace CommandLine {
 	class VariablesMap
 	{
 		bool mParaError;
-		typedef std::map<std::string, std::string> VariablesMapContainer;
+		using VariablesMapContainer = std::map<std::string, std::string>;
 		VariablesMapContainer mVariablesMapContainer;
 	public:
 		VariablesMap () : mParaError (false) {}								///< Constructor. Creates a empty VariablesMap.
@@ -125,7 +125,7 @@ namespace CommandLine {
 	};
 
 	//! type of the list of elements on the command line that are not handled by options parsing
-	typedef std::vector<std::string> FilesVector;
+	using FilesVector = std::vector<std::string>;
 
 	//------------------------------------------------------------------------
 	/** The description of one single command-line option. 
@@ -151,7 +151,7 @@ namespace CommandLine {
 	//------------------------------------------------------------------------
 	class Descriptions 
 	{
-		typedef std::deque<Description> DescriptionsList;
+		using DescriptionsList = std::deque<Description>;
 		DescriptionsList mDescriptions;
 		std::string mCaption;
 	public:
@@ -159,7 +159,7 @@ namespace CommandLine {
 	    Descriptions& addOptions (const std::string& caption = "",
 	                              std::initializer_list<Description>&& options = {});
 	    /** Parse the command-line. */
-		bool parse (int ac, char* av[], VariablesMap& result, FilesVector* files = 0) const;
+		bool parse (int ac, char* av[], VariablesMap& result, FilesVector* files = nullptr) const;
 		/** Print a brief description for the command-line tool into the stream @c os. */
 		void print (std::ostream& os) const;
 		/** Add a new switch. Only */
@@ -202,11 +202,11 @@ namespace CommandLine {
 	//------------------------------------------------------------------------
 	template <> Descriptions& Descriptions::operator() (const std::string& name, const std::string& inType, std::string help)
 	{
-		mDescriptions.push_back (Description (name, help, inType));
+		mDescriptions.emplace_back (name, help, inType);
 		return *this;
 	}
-	bool parse (int ac, char* av[], const Descriptions& desc, VariablesMap& result, FilesVector* files = 0); ///< Parse the command-line.
-    std::ostream& operator<< (std::ostream& os, const Descriptions& desc);			 ///< Make Descriptions stream able.
+	bool parse (int ac, char* av[], const Descriptions& desc, VariablesMap& result, FilesVector* files = nullptr); ///< Parse the command-line.
+    std::ostream& operator<< (std::ostream& os, const Descriptions& desc); ///< Make Descriptions stream able.
 
 	const std::string Description::kBool = "bool";
 	const std::string Description::kString = "string";
@@ -234,7 +234,7 @@ namespace CommandLine {
     */
     Descriptions& Descriptions::operator () (const std::string& name, const std::string& help)
     {
-	    mDescriptions.push_back (Description (name, help, Description::kBool));
+	    mDescriptions.emplace_back (name, help, Description::kBool);
 	    return *this;
     }
 
@@ -278,73 +278,71 @@ namespace CommandLine {
 		@param[out] result the parsing result
 		@param[out] files optional list of elements on the command line that are not handled by options parsing
 	*/
-	bool Descriptions::parse (int ac, char* av[], VariablesMap& result, FilesVector* files) const
-	{
-		using namespace std;
+    bool Descriptions::parse (int ac, char* av[], VariablesMap& result, FilesVector* files) const
+    {
+	    using namespace std;
 
-		int i;
-		for (i = 1; i < ac; i++)
-		{
-			string current = av[i];
-			if (current[0] == '-')
-			{
-				int pos = current[1] == '-' ? 2 : 1;
-				current = current.substr (pos, string::npos);
+	    for (int i = 1; i < ac; i++)
+	    {
+		    string current = av[i];
+		    if (current[0] == '-')
+		    {
+			    int pos = current[1] == '-' ? 2 : 1;
+			    current = current.substr (pos, string::npos);
 
-				DescriptionsList::const_iterator found =
-					find (mDescriptions.begin (), mDescriptions.end (), current);
-				if (found != mDescriptions.end ())
-				{
-					result[*found] = "true";
-					if (found->mType != Description::kBool)
-					{
-						if (((i + 1) < ac) && *av[i + 1] != '-')
-						{
-							result[*found] = av[++i];
-						}
-						else
-						{
-							result[*found] = "error!";
-							result.setError ();
-							return false;
-						}
-					}
-				}
-				else
-				{
-					result.setError ();
-					return false;
-				}
+			    DescriptionsList::const_iterator found =
+			        find (mDescriptions.begin (), mDescriptions.end (), current);
+			    if (found != mDescriptions.end ())
+			    {
+				    result[*found] = "true";
+				    if (found->mType != Description::kBool)
+				    {
+					    if (((i + 1) < ac) && *av[i + 1] != '-')
+					    {
+						    result[*found] = av[++i];
+					    }
+					    else
+					    {
+						    result[*found] = "error!";
+						    result.setError ();
+						    return false;
+					    }
+				    }
+			    }
+			    else
+			    {
+				    result.setError ();
+				    return false;
+			    }
+		    }
+		    else if (files)
+			    files->push_back (av[i]);
+	    }
+	    return true;
+    }
 
-			}
-			else if (files)
-				files->push_back (av[i]);
-		}
-		return true;
-	}
-	//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 	/*!	The description includes the help strings for all options. */
 	//------------------------------------------------------------------------
-	void Descriptions::print (std::ostream& os) const
-	{
-		if (!mCaption.empty ())
-			os << mCaption << ":\n";
+    void Descriptions::print (std::ostream& os) const
+    {
+	    if (!mCaption.empty ())
+		    os << mCaption << ":\n";
 
-		size_t maxLength = 0u;
+	    size_t maxLength = 0u;
 	    std::for_each (mDescriptions.begin (), mDescriptions.end (),
 	                   [&] (const Description& d) { maxLength = std::max (maxLength, d.size ()); });
 
-	    for (auto i = 0u; i < mDescriptions.size (); ++i)
-		{
-			const Description& opt = mDescriptions[i];
-			os << "-" << opt;
-			for (auto s = opt.size (); s < maxLength; ++s)
-				os << " ";
-			os << " | " << opt.mHelp << "\n";
-		}
-	}
-	
-	//------------------------------------------------------------------------
+	    for (const Description& opt : mDescriptions)
+	    {
+		    os << "-" << opt;
+		    for (auto s = opt.size (); s < maxLength; ++s)
+			    os << " ";
+		    os << " | " << opt.mHelp << "\n";
+	    }
+    }
+
+//------------------------------------------------------------------------
     std::ostream& operator<< (std::ostream& os, const Descriptions& desc)
 	{
         desc.print (os);
