@@ -92,6 +92,7 @@ namespace Thread {
 FCondition::FCondition (const char8* name)
 {
 #if SMTG_PTHREADS
+	(void)name; // unused
 	pthread_mutex_init (&mutex, 0);
 	pthread_cond_init (&cond, 0);
 	state = 0;

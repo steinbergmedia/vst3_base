@@ -291,12 +291,16 @@ void* operator new[] (size_t size, int, const char* file, int line)
 //------------------------------------------------------------------------
 void operator delete (void* p, int, const char* file, int line)
 {
+	(void)file;
+	(void)line;
 	::operator delete (p);
 }
 
 //------------------------------------------------------------------------
 void operator delete[] (void* p, int, const char* file, int line)
 {
+	(void)file;
+	(void)line;
 	::operator delete[] (p);
 }
 

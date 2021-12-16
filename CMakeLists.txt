@@ -95,7 +95,7 @@ if(MSVC)
     set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /IGNORE:4221")
 endif(MSVC)
 
-smtg_setup_universal_binary(base)
+smtg_target_setup_universal_binary(base)
 
 # iOS target
 if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
