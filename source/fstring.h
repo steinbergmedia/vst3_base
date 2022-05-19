@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2022, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -416,7 +416,15 @@ public:
 
 	// numbers-----------------------------------------------------------------
 	String& printInt64 (int64 value);
-	String& printFloat (double value);
+
+	/**
+	* @brief				print a float into a string, trailing zeros will be trimmed
+	* @param value			the floating value to be printed
+	* @param maxPrecision	(optional) the max precision allowed for this, num of significant digits after the comma
+	*						For instance printFloat (1.234, 2) => 1.23
+	*  @return				the resulting string.
+	*/
+	String& printFloat (double value, uint32 maxPrecision = 6);
 	/** Increment the trailing number if present else start with minNumber, width specifies the string width format (width 2 for number 3 is 03),
 		applyOnlyFormat set to true will only format the string to the given width without incrementing the founded trailing number */
 	bool incrementTrailingNumber (uint32 width = 2, tchar separator = STR (' '), uint32 minNumber = 1, bool applyOnlyFormat = false);

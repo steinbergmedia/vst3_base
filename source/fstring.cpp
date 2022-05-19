@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2021, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2022, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -45,8 +45,15 @@
 #include <cstdio>
 #include <cstdarg>
 #include <utility>
+#include <complex>
+#include <cmath>
+#include <algorithm>
+#include <cassert>
 
 #if SMTG_OS_WINDOWS
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #ifdef _MSC_VER
 #pragma warning (disable : 4244)
@@ -3375,55 +3382,44 @@ String& String::printInt64 (int64 value)
 }
 
 //-----------------------------------------------------------------------------
-String& String::printFloat (double value)
+String& String::printFloat (double value, uint32 maxPrecision)
 {
+	static constexpr auto kMaxAfterCommaResolution = 16;
+	// escape point for integer values, avoid unnecessary complexity later on
+	const bool withinInt64Boundaries = value <= std::numeric_limits<int64>::max () && value >= std::numeric_limits<int64>::lowest ();
+	if (withinInt64Boundaries && (maxPrecision == 0 || std::round (value) == value))
+		return printInt64 (value);
+
+	const auto absValue = std::abs (value);
+	const uint32 valueExponent = absValue >= 1 ? std::log10 (absValue) : -std::log10 (absValue) + 1;
+
+	maxPrecision = std::min<uint32> (kMaxAfterCommaResolution - valueExponent, maxPrecision);
+
 	if (isWide)
-	{
-		char16 string[kPrintfBufferSize];
-		sprintf16 (string, STR16 ("%lf"), value);
-
-		char16* pointPtr = strrchr16 (string, STR ('.'));
-		if (pointPtr)
-		{
-			pointPtr++; // keep 1st digit after point
-			int32 index = strlen16 (string) - 1;
-			char16 zero = STR16 ('0');
-			while (pointPtr < (string + index))
-			{
-				if (string[index] == zero)
-				{
-					string[index] = 0;
-					index--;
-				}
-				else
-					break;
-			}
-		}
-		return assign (string);
-	}
+		printf (STR ("%s%dlf"), STR ("%."), maxPrecision);
 	else
-	{
-		char8 string[kPrintfBufferSize];
-		sprintf (string, "%lf", value);
+		printf ("%s%dlf", "%.", maxPrecision);
 
-		char8* pointPtr = strrchr (string, '.');
-		if (pointPtr)
+	if (isWide)
+		printf (text16 (), value);
+	else
+		printf (text8 (), value);
+
+	// trim trail zeros
+	for (int32 i = length () - 1; i >= 0; i--)
+	{
+		if (isWide && testChar16 (i, '0') || testChar8 (i, '0'))
+			remove (i);
+		else if (isWide && testChar16(i,'.') || testChar8(i, '.'))
 		{
-			pointPtr++; // keep 1st digit after point
-			int32 index = (int32) (strlen (string) - 1);
-			while (pointPtr < (string + index))
-			{
-				if (string[index] == '0')
-				{
-					string[index] = 0;
-					index--;
-				}
-				else
-					break;
-			}
+			remove(i);
+			break;
 		}
-		return assign (string);
+		else
+			break;
 	}
+
+	return *this;
 }
 
 //-----------------------------------------------------------------------------
