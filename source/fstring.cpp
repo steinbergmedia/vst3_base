@@ -209,34 +209,32 @@ static bool fromCFStringRef (Steinberg::char8* dest, Steinberg::int32 destSize, 
 #endif // SMTG_OS_MACOS
 
 #if SMTG_OS_WINDOWS
-#define stricmp16 wcsicmp
-#define strnicmp16 wcsnicmp
-#define strrchr16 wcsrchr
-#define sprintf16 swprintf
-#define snprintf16 snwprintf
-#define vsnprintf16 vsnwprintf
-#define vsprintf16 wvsprintf
-#define vfprintf16 vfwprintf
-#define sscanf16 swscanf
-#define toupper16 towupper
-#define tolower16 towlower
-#define isupper16 iswupper
-#define islower16 iswlower
-#define isspace16 iswspace
-#define isalpha16 iswalpha
-#define isdigit16 iswdigit
-#define isalnum16 iswalnum
+//-----------------------------------------------------------------------------
+static inline int stricmp16 (const Steinberg::tchar* s1, const Steinberg::tchar* s2)
+{
+	return wcsicmp (Steinberg::wscast (s1), Steinberg::wscast (s2));
+}
 
-#define stricmp _stricmp
-#define strnicmp _strnicmp
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define snwprintf _snwprintf
-#define vsnwprintf _vsnwprintf
+//-----------------------------------------------------------------------------
+static inline int strnicmp16 (const Steinberg::tchar* s1, const Steinberg::tchar* s2, size_t l)
+{
+	return wcsnicmp (Steinberg::wscast (s1), Steinberg::wscast (s2), l);
+}
 
-#define wtoi _wtoi
-#define wtol _wtol
-#define wtof _wtof
+//-----------------------------------------------------------------------------
+static inline int vsnwprintf (Steinberg::char16* buffer, size_t bufferSize,
+                              const Steinberg::char16* format, va_list args)
+{
+	return _vsnwprintf (Steinberg::wscast (buffer), bufferSize, Steinberg::wscast (format), args);
+}
+
+//-----------------------------------------------------------------------------
+static inline Steinberg::int32 sprintf16 (Steinberg::char16* str, const Steinberg::char16* format, ...)
+{
+	va_list marker;
+	va_start (marker, format);
+	return vsnwprintf (str, -1, format, marker);
+}
 
 #elif SMTG_OS_LINUX
 #include <codecvt>
@@ -542,6 +540,9 @@ bool ConstString::testChar16 (uint32 index, char16 c) const
 //-----------------------------------------------------------------------------
 bool ConstString::extract (String& result, uint32 idx, int32 n) const
 {
+	// AddressSanitizer : when extracting part of "this" on itself, it can lead to heap-use-after-free.
+	SMTG_ASSERT (this != static_cast<ConstString*> (&result))
+	
 	if (len == 0|| idx >= len)
 		return false;
 
@@ -1878,7 +1879,7 @@ int32 ConstString::multiByteToWideString (char16* dest, const char8* source, int
 	}
 	int32 result = 0;
 #if SMTG_OS_WINDOWS
-	result = MultiByteToWideChar (sourceCodePage, MB_ERR_INVALID_CHARS, source, -1, dest, charCount);
+	result = MultiByteToWideChar (sourceCodePage, MB_ERR_INVALID_CHARS, source, -1, wscast (dest), charCount);
 #endif
 
 #if SMTG_OS_MACOS
@@ -1936,7 +1937,7 @@ int32 ConstString::multiByteToWideString (char16* dest, const char8* source, int
 int32 ConstString::wideStringToMultiByte (char8* dest, const char16* wideString, int32 charCount, uint32 destCodePage)
 {
 #if SMTG_OS_WINDOWS
-	return WideCharToMultiByte (destCodePage, 0, wideString, -1, dest, charCount, nullptr, nullptr);
+	return WideCharToMultiByte (destCodePage, 0, wscast (wideString), -1, dest, charCount, nullptr, nullptr);
 
 #elif SMTG_OS_MACOS
 	int32 result = 0;
@@ -2026,7 +2027,7 @@ bool ConstString::isNormalized (UnicodeNormalization n)
 #ifdef UNICODE
 	if (n != kUnicodeNormC)
 		return false;
-	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, buffer16, len, nullptr, 0));
+	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, wscast (buffer16), len, nullptr, 0));
 	return (normCharCount == len);
 #else
 	return false; 
@@ -2285,12 +2286,12 @@ bool String::normalize (UnicodeNormalization n)
 	if (n != kUnicodeNormC)
 		return false;
 
-	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, buffer16, len, nullptr, 0));
+	uint32 normCharCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, wscast (buffer16), len, nullptr, 0));
 	if (normCharCount == len)
 		return true;
 
 	char16* newString = (char16*)malloc ((normCharCount + 1) * sizeof (char16));
-	uint32 converterCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, buffer16, len, newString, normCharCount + 1));
+	uint32 converterCount = static_cast<uint32> (FoldString (MAP_PRECOMPOSED, wscast (buffer16), len, wscast (newString), normCharCount + 1));
 	if (converterCount != normCharCount)
 	{
 		free (newString);

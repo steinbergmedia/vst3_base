@@ -121,8 +121,6 @@ uint32 PLUGIN_API FObject::release ()
 	if (FUnknownPrivate::atomicAdd (refCount, -1) == 0)
 	{
 		refCount = -1000;
-		// This assert will fire even if kDestoyed will be triggern in the DTor
-		// ASSERT (dependencyCount == 0);
 		delete this;
 		return 0;
 	}

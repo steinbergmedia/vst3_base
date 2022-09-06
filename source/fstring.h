@@ -278,6 +278,11 @@ public:
 
 	bool isNormalized (UnicodeNormalization = kUnicodeNormC); ///< On PC only kUnicodeNormC is working
 
+#if SMTG_OS_WINDOWS
+	ConstString (const wchar_t* str, int32 length = -1) : ConstString (wscast (str), length) {}
+	operator const wchar_t* () const { return wscast (text16 ());}
+#endif
+
 #if SMTG_OS_MACOS
 	virtual void* toCFStringRef (uint32 encoding = 0xFFFF, bool mutableCFString = false) const;	///< CFString conversion
 #endif
@@ -455,6 +460,11 @@ public:
 
 	void fromUTF8 (const char8* utf8String);				///< Assigns from UTF8 string
 	bool normalize (UnicodeNormalization = kUnicodeNormC);	///< On PC only kUnicodeNormC is working
+
+#if SMTG_OS_WINDOWS
+	String (const wchar_t* str, int32 length = -1, bool isTerminated = true) : String (wscast (str), length, isTerminated) {}
+	String& operator= (const wchar_t* str) {return String::operator= (wscast (str)); }
+#endif
 
 #if SMTG_OS_MACOS
 	virtual bool fromCFStringRef (const void*, uint32 encoding = 0xFFFF);	///< CFString conversion
