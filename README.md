@@ -1,6 +1,6 @@
 # Welcome to VST SDK 3 base
 
-Here you can find some helper classes useful for developing VST3 Plug-Ins.
+Here you can find some helper classes useful for developing **VST 3** plug-ins.
 
 ## License & Usage guidelines
 

@@ -245,7 +245,7 @@ void FDebugBreak (const char* format, ...)
 void FPrintLastError (const char* file, int line)
 {
 #if SMTG_OS_WINDOWS
-	LPVOID lpMessageBuffer;
+	LPVOID lpMessageBuffer = nullptr;
 	FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr,
 	                GetLastError (), MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
 	                (LPSTR)&lpMessageBuffer, 0, nullptr);

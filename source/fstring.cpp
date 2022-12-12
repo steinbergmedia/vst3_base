@@ -2057,11 +2057,27 @@ String::String ()
 //-----------------------------------------------------------------------------
 String::String (const char8* str, MBCodePage codePage, int32 n, bool isTerminated)
 {
-	isWide = 0;
+	isWide = false;
 	if (str)
 	{
-		assign (str, n, isTerminated);
-		toWideString (codePage);
+		if (isTerminated && n >= 0 && str[n] != 0)
+		{
+			// isTerminated is not always set correctly
+			isTerminated = false;
+		}
+
+		if (!isTerminated)
+		{
+			assign (str, n, isTerminated);
+			toWideString (codePage);
+		}
+		else
+		{
+			if (n < 0)
+				n = static_cast<int32> (strlen (str));
+			if (n > 0)
+				_toWideString (str, n, codePage);
+		}
 	}
 }
 
@@ -2154,21 +2170,32 @@ void String::updateLength ()
 //-----------------------------------------------------------------------------
 bool String::toWideString (uint32 sourceCodePage)
 {
+	if (!isWide && buffer8 && len > 0)
+		return _toWideString (buffer8, len, sourceCodePage);
+	isWide = true;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool String::_toWideString (const char8* src, int32 length, uint32 sourceCodePage)
+{
 	if (!isWide)
 	{
-		if (buffer8 && len > 0)
+		if (src && length > 0)
 		{
-			int32 bytesNeeded = multiByteToWideString (nullptr, buffer8, 0, sourceCodePage) * sizeof (char16);
+			int32 bytesNeeded = multiByteToWideString (nullptr, src, 0, sourceCodePage) * sizeof (char16);
 			if (bytesNeeded)
 			{
 				bytesNeeded += sizeof (char16);
-				char16* newStr = (char16*) malloc (bytesNeeded);
-				if (multiByteToWideString (newStr, buffer8, len + 1, sourceCodePage) <= 0)
+				char16* newStr = (char16*)malloc (bytesNeeded);
+				if (multiByteToWideString (newStr, src, length + 1, sourceCodePage) < 0)
 				{
 					free (newStr);
 					return false;
 				}
-				free (buffer8);
+				if (buffer8)
+					free (buffer8);
+
 				buffer16 = newStr;
 				isWide = true;
 				updateLength ();
@@ -2268,8 +2295,8 @@ bool String::toMultiByte (uint32 destCodePage)
 //-----------------------------------------------------------------------------
 void String::fromUTF8 (const char8* utf8String)
 {
-	assign (utf8String);
-	toWideString (kCP_Utf8);
+	resize (0, false);
+	_toWideString (utf8String, static_cast<int32> (strlen (utf8String)), kCP_Utf8);
 }
 
 //-----------------------------------------------------------------------------
@@ -3464,17 +3491,19 @@ bool String::incrementTrailingNumber (uint32 width, tchar separator, uint32 minN
 	}
 	else
 	{
-		char format[64];
-		char trail[128];
+		static constexpr auto kFormatSize = 64u;
+		static constexpr auto kTrailSize = 64u;
+		char format[kFormatSize];
+		char trail[kTrailSize];
 		if (separator && isEmpty () == false)
 		{
-			sprintf (format, "%%c%%0%uu", width);
-			sprintf (trail, format, separator, (uint32) number);
+			snprintf (format, kFormatSize, "%%c%%0%uu", width);
+			snprintf (trail, kTrailSize, format, separator, (uint32) number);
 		}
 		else
 		{
-			sprintf (format, "%%0%uu", width);
-			sprintf (trail, format, (uint32) number);
+			snprintf (format, kFormatSize, "%%0%uu", width);
+			snprintf (trail, kTrailSize, format, (uint32) number);
 		}
 		append (trail);
 	}

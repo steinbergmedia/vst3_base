@@ -132,8 +132,8 @@ public:
 	MacPlatformTimer (ITimerCallback* callback, uint32 milliseconds);
 	~MacPlatformTimer ();
 
-	void stop ();
-	bool verify () const { return platformTimer != 0; }
+	void stop () override;
+	bool verify () const { return platformTimer != nullptr; }
 
 	static void timerCallback (CFRunLoopTimerRef timer, void* info);
 
@@ -144,7 +144,7 @@ protected:
 
 //------------------------------------------------------------------------
 MacPlatformTimer::MacPlatformTimer (ITimerCallback* callback, uint32 milliseconds)
-: platformTimer (0), callback (callback)
+: platformTimer (nullptr), callback (callback)
 {
 	if (callback)
 	{
@@ -171,7 +171,7 @@ void MacPlatformTimer::stop ()
 	{
 		CFRunLoopRemoveTimer (CFRunLoopGetMain (), platformTimer, kCFRunLoopCommonModes);
 		CFRelease (platformTimer);
-		platformTimer = 0;
+		platformTimer = nullptr;
 	}
 }
 
@@ -180,18 +180,15 @@ void MacPlatformTimer::timerCallback (CFRunLoopTimerRef, void* info)
 {
 	if (timersEnabled)
 	{
-		MacPlatformTimer* timer = (MacPlatformTimer*)info;
-		if (timer)
-		{
+		if (auto timer = (MacPlatformTimer*)info)
 			timer->callback->onTimer (timer);
-		}
 	}
 }
 
 //------------------------------------------------------------------------
 Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 {
-	MacPlatformTimer* timer = NEW MacPlatformTimer (callback, milliseconds);
+	auto timer = NEW MacPlatformTimer (callback, milliseconds);
 	if (timer->verify ())
 		return timer;
 	timer->release ();
@@ -220,8 +217,8 @@ uint64 getTicks64 ()
 #else
 	return GetTickCount64 ();
 #endif
-}
-}
+} // namespace SystemTime
+} // namespace Steinberg
 
 class WinPlatformTimer;
 using WinPlatformTimerList = std::list<WinPlatformTimer*>;

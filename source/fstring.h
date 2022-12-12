@@ -476,6 +476,7 @@ protected:
 	bool resize (uint32 newSize, bool wide, bool fill = false);
 
 private:
+	bool _toWideString (const char8* src, int32 length, uint32 sourceCodePage = kCP_Default);
 	void tryFreeBuffer ();
 	bool checkToMultiByte (uint32 destCodePage = kCP_Default) const; // to remove debug code from inline - const_cast inside!!!
 };
