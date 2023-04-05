@@ -587,9 +587,12 @@ TSize FStreamer::writeString8 (const char8* ptr, bool terminate)
 //------------------------------------------------------------------------
 TSize FStreamer::readString8 (char8* ptr, TSize size)
 {
+	if (size < 1)
+		return 0;
 	TSize i = 0;
+	TSize limit = size - 1;
 	char8 c = 0;
-	while (i < size)
+	while (i < limit)
 	{
 		if (readRaw ((void*)&c, sizeof (char)) != sizeof (char))
 			break;
@@ -598,14 +601,16 @@ TSize FStreamer::readString8 (char8* ptr, TSize size)
 		if (c == '\n' || c == '\0')
 			break;
 	}
-	if (c == '\n' && ptr[i - 2] == '\r')
-		ptr[i - 2] = 0;
-	if (i < size)
-		ptr[i] = 0;
-	else
-		ptr[size - 1] = 0;
+	if (c == '\n')
+	{
+		if (i > 1 && ptr[i - 2] == '\r')
+			i = i - 2;
+		else
+			i = i - 1;
+	}
+	ptr[i] = 0;
 
-	return strlen (ptr);
+	return i;
 }
 
 //------------------------------------------------------------------------
