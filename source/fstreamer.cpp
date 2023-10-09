@@ -607,8 +607,10 @@ TSize FStreamer::readString8 (char8* ptr, TSize size)
 		if (i > 0 && ptr[i - 1] == '\r')
 			i--;
 	}
+	if (i >= size)
+		i = size - 1;
 	ptr[i] = 0;
-
+	
 	return i;
 }
 

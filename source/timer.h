@@ -173,5 +173,10 @@ private:
 	bool oldState;
 };
 
+#if SMTG_OS_LINUX
+using CreateTimerFunc = Timer* (*)(ITimerCallback* callback, uint32 intervalMilliseconds);
+void InjectCreateTimerFunction (CreateTimerFunc f);
+#endif
+
 //------------------------------------------------------------------------
 } // namespace Steinberg

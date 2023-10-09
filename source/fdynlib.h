@@ -70,7 +70,7 @@ public:
 	
 	/** Destructor.
 		The destructor unloads the library.*/
-	~FDynLibrary ();
+	~FDynLibrary () override;
 
 	/** Loads the library if not already loaded.
 		This function is normally called by FDynLibrary(). 

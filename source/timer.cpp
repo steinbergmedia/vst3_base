@@ -356,10 +356,19 @@ uint64 getTicks64 ()
 //------------------------------------------------------------------------
 } // namespace SystemTime
 
+static CreateTimerFunc createTimerFunc = nullptr;
+
+//------------------------------------------------------------------------
+void InjectCreateTimerFunction (CreateTimerFunc f)
+{
+	createTimerFunc = f;
+}
+
 //------------------------------------------------------------------------
 Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 {
-	assert (false && "DEPRECATED No Linux implementation");
+	if (createTimerFunc)
+		return createTimerFunc (callback, milliseconds);
 	return nullptr;
 }
 

@@ -2245,7 +2245,8 @@ bool String::toMultiByte (uint32 destCodePage)
 //-----------------------------------------------------------------------------
 void String::fromUTF8 (const char8* utf8String)
 {
-	resize (0, false);
+	if (buffer8 != utf8String)
+		resize (0, false);
 	_toWideString (utf8String, static_cast<int32> (strlen (utf8String)), kCP_Utf8);
 }
 
