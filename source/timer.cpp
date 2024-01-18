@@ -9,7 +9,7 @@
 // 
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -231,7 +231,7 @@ class WinPlatformTimer : public Timer
 public:
 //------------------------------------------------------------------------
 	WinPlatformTimer (ITimerCallback* callback, uint32 milliseconds);
-	~WinPlatformTimer ();
+	~WinPlatformTimer () override;
 
 	void stop () override;
 	bool verify () const { return id != 0; }

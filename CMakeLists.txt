@@ -88,7 +88,7 @@ target_compile_options(base
 
 target_compile_features(base
     PUBLIC
-        cxx_std_11
+        cxx_std_17
 )
 
 if(MSVC)
@@ -113,5 +113,5 @@ if(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
             "$<$<CONFIG:Release>:-DRELEASE=1>"
             "$<$<CONFIG:RelWithDebInfo>:-DRELEASE=1>"
     )
-	target_compile_features(base_ios PUBLIC cxx_std_11)
+	target_compile_features(base_ios PUBLIC cxx_std_17)
 endif(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
