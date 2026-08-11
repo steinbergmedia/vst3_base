@@ -27,6 +27,11 @@
 #include <cstdarg>
 #include <cstdlib>
 
+#if SMTG_CPP17
+#include <limits>
+#include <string_view>
+#endif
+
 namespace Steinberg {
 
 class FVariant;
@@ -203,7 +208,7 @@ public:
 	inline int32 findLast (char8 c, CompareMode m = kCaseSensitive) const {return findPrev (-1, c, m);}
 	inline int32 findLast (char16 c, CompareMode m = kCaseSensitive) const {return findPrev (-1, c, m);}
 
-	int32 countOccurences (char8 c, uint32 startIndex, CompareMode = kCaseSensitive) const; ///< Counts occurences of c within this starting at index
+	int32 countOccurences (char8 c, uint32 startIndex, CompareMode = kCaseSensitive) const; ///< Counts occurrences of c within this starting at index
 	int32 countOccurences (char16 c, uint32 startIndex, CompareMode = kCaseSensitive) const;
 	int32 getFirstDifferent (const ConstString& str, CompareMode = kCaseSensitive) const;	///< Returns position of first different character
 	//-------------------------------------------------------------------------
@@ -334,6 +339,46 @@ public:
 	String& operator= (const String& str) {return assign (str);}
 	String& operator= (char8 c) {return assign (c);}
 	String& operator= (char16 c) {return assign (c);}
+#if SMTG_CPP17
+	String (std::string_view s) { *this = s; }
+	String (std::u16string_view s) { *this = s; }
+	String& operator= (std::string_view s) 
+	{
+		if (s.size () >= static_cast<size_t>(std::numeric_limits<int32>::max ()))
+			return assign (STR (""), 0);
+		return assign (s.data (), static_cast<int32> (s.size ()));
+	}
+	String& operator= (std::u16string_view s) 
+	{
+		if (s.size () >= static_cast<size_t>(std::numeric_limits<int32>::max ()))
+			return assign (STR (""), 0);
+		return assign (s.data (), static_cast<int32> (s.size ()));
+	}
+	String& assign (std::string_view s)
+	{
+		if (s.size () >= static_cast<size_t>(std::numeric_limits<int32>::max ()))
+			return assign (STR (""), 0);
+		return assign (s.data (), static_cast<int32> (s.size ()));
+	}
+	String& assign (std::u16string_view s)
+	{
+		if (s.size () >= static_cast<size_t>(std::numeric_limits<int32>::max ()))
+			return assign (STR (""), 0);
+		return assign (s.data (), static_cast<int32> (s.size ()));
+	}
+	String& append (std::string_view s)
+	{
+		if (s.size () >= static_cast<size_t>(std::numeric_limits<int32>::max ()))
+			return *this;
+		return append (s.data (), static_cast<int32> (s.size ()));
+	}
+	String& append (std::u16string_view s)
+	{
+		if (s.size () >= static_cast<size_t>(std::numeric_limits<int32>::max ()))
+			return *this;
+		return append (s.data (), static_cast<int32> (s.size ()));
+	}
+#endif
 
 	String& assign (const ConstString& str, int32 n = -1);			///< Assign n characters of str (-1: all)
 	String& assign (const char8* str, int32 n = -1, bool isTerminated = true);			///< Assign n characters of str (-1: all)

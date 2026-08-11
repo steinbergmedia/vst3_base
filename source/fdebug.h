@@ -182,7 +182,7 @@ void* operator new (size_t, int, const char*, int);
 #define SMTG_WARNING(s)
 #define SMTG_PRINTSYSERROR
 #define SMTG_DEBUGSTR(s)
-#define SMTG_VERIFY(f) f;
+#define SMTG_VERIFY(f) (void)(f); // avoid warning for unused expressions
 #define SMTG_VERIFY_IS(f, r) f;
 #define SMTG_VERIFY_NOT(f, r) f;
 

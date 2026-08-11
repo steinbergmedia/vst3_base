@@ -96,7 +96,7 @@ public:
 	virtual void addDependent (IDependent* dep);							///< adds dependency to the object
 	virtual void removeDependent (IDependent* dep);							///< removes dependency from the object
 	virtual void changed (int32 msg = kChanged);							///< Inform all dependents, that the object has changed.
-	virtual void deferUpdate (int32 msg = kChanged);						///< Similar to triggerUpdates, except only delivered in idle (usefull in collecting updates).
+	virtual void deferUpdate (int32 msg = kChanged);						///< Similar to triggerUpdates, except only delivered in idle (useful in collecting updates).
 	virtual void updateDone (int32 /* msg */) {}							///< empty virtual method that should be overridden by derived classes
 	virtual bool isEqualInstance (FUnknown* d) {return this == d;}
 	
@@ -418,20 +418,20 @@ virtual Steinberg::uint32 PLUGIN_API release ()SMTG_OVERRIDE{ return BaseClass::
 /** Start defining interfaces. */
 //------------------------------------------------------------------------
 #define DEFINE_INTERFACES \
-Steinberg::tresult PLUGIN_API queryInterface (const Steinberg::TUID iid, void** obj) SMTG_OVERRIDE \
+Steinberg::tresult PLUGIN_API queryInterface (const Steinberg::TUID _iid, void** obj) SMTG_OVERRIDE \
 {
 
 //------------------------------------------------------------------------
 /** Add a interfaces. */
 //------------------------------------------------------------------------
 #define DEF_INTERFACE(InterfaceName) \
-	QUERY_INTERFACE (iid, obj, Steinberg::getTUID<InterfaceName> (), InterfaceName)
+	QUERY_INTERFACE (_iid, obj, Steinberg::getTUID<InterfaceName> (), InterfaceName)
 
 //------------------------------------------------------------------------
 /** End defining interfaces. */
 //------------------------------------------------------------------------
 #define END_DEFINE_INTERFACES(BaseClass) \
-	return BaseClass::queryInterface (iid, obj); \
+	return BaseClass::queryInterface (_iid, obj); \
 }
 ///@}
 
